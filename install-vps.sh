@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Installation du relais TURN "Let Us Share" sur Debian 12 (à lancer en root).
-# Usage : bash install-vps.sh <nom-de-domaine> <votre-email> [url-du-binaire]
+# Usage : bash install-vps.sh <nom-de-domaine> <votre-email | none> [url-du-binaire]
+#   (mettre none à la place de l'email pour s'en passer : pratique si le @ est difficile à taper)
 #   ex. : bash install-vps.sh turn.mondomaine.fr moi@mail.com
 # Le binaire p2p-relay-linux-amd64 doit être dans le même dossier que ce script,
 # sinon donnez en 3e argument l'adresse où le télécharger.
@@ -37,7 +38,8 @@ ufw allow 50000:50999/udp # ports de relais média
 ufw --force enable
 
 echo "== 4/7 Certificat Let's Encrypt =="
-certbot certonly --standalone -d "$DOMAIN" -m "$EMAIL" --agree-tos --non-interactive
+if [ "$EMAIL" = "none" ]; then MAILARG="--register-unsafely-without-email"; else MAILARG="-m $EMAIL"; fi
+certbot certonly --standalone -d "$DOMAIN" $MAILARG --agree-tos --non-interactive
 
 echo "== 5/7 Programme du relais =="
 id p2prelay >/dev/null 2>&1 || useradd --system --no-create-home --shell /usr/sbin/nologin p2prelay

@@ -280,13 +280,39 @@ td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
 #info .flow .nd{border:2px solid var(--ok);border-radius:10px;padding:8px 12px;font-weight:500}
 #info .flow .ar{color:var(--ok);font-weight:600}
 #info .flow .lbl{width:100%;color:var(--muted);font-size:12.5px}
+
+/* ---- mode de connexion : Réunion / Dépannage ---- */
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mode{position:relative;display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:var(--panel2)}
+.mode input{position:absolute;opacity:0;pointer-events:none}
+.mode b{font-weight:600}.mode span{font-size:12px;color:var(--muted);line-height:1.3}
+.mode.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.mode:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:1px}
+body.support #cMic,body.support #cCam{display:none}
+body.support #tiles{align-content:start;grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+body.support .tile:not(.screen){aspect-ratio:auto;height:60px}
+body.support .tile:not(.screen) .ph{font-size:22px;place-items:center start;padding-left:16px}
+body.support .tile:not(.screen) video{display:none}
+body.support .tile.screen{aspect-ratio:auto;height:calc(100dvh - 190px);min-height:240px}
+#supHint{position:absolute;inset:0 0 70px 0;display:grid;place-items:center;padding:16px;z-index:4;pointer-events:none}
+#supHint .card{max-width:440px;pointer-events:auto;text-align:center;align-items:center}
+#supHint .card h2{font-size:18px}
+/* ---- outils sur l'écran partagé : laser, dessin, clavier ---- */
+.tile .tb{flex-wrap:wrap;justify-content:flex-end;max-width:calc(100% - 16px);z-index:6}
+.tile canvas.ov{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5;touch-action:none}
+.tile.tool canvas.ov{pointer-events:auto;cursor:crosshair}
+.tile .tb .btn{background:rgba(255,255,255,.92);color:#1a2230;border-color:rgba(0,0,0,.15)}
+.tile .tb .btn.danger{background:var(--danger);color:#fff}
+.tile .btn.sm.on{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.clipmsg{display:flex;flex-direction:column;gap:6px}
+.clipmsg pre{margin:0;font:12px/1.4 ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;max-height:110px;overflow:auto;background:var(--bg);border-radius:6px;padding:6px}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
 </head>
 <body>
 <div id="app">
   <div class="bar" id="topbar">
-    <div class="brand"><i class="ico" data-i="share"></i><span>Let Us Share</span><span class="tag">prototype v4.1</span></div>
+    <div class="brand"><i class="ico" data-i="share"></i><span>Let Us Share</span><span class="tag">prototype v4.2</span></div>
     <span class="pill" id="statusPill"><i class="dot" id="statusDot"></i><span id="statusTxt">Hors réunion</span></span>
     <div class="spacer"></div>
     <button class="btn" id="bSide" title="Afficher ou masquer le panneau Chat / Fichiers / Connexion" hidden><span class="ico" data-i="sidebar"></span><span class="hide-s">Panneau</span></button>
@@ -304,7 +330,11 @@ td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
           <p class="sub">Visio, chat et partage de fichiers. Aucun serveur central : les flux passent directement entre les participants.</p>
           <label class="lbl" for="name">Votre nom</label>
           <input class="inp" id="name" placeholder="Comment les autres vous voient" autocomplete="off" maxlength="40">
-          <div class="row">
+          <div class="modes" role="radiogroup" aria-label="Mode de connexion">
+            <label class="mode on"><input type="radio" name="mode" value="meet" checked><b>Réunion</b><span>Visio, son, chat, fichiers et écran</span></label>
+            <label class="mode"><input type="radio" name="mode" value="support"><b>Dépannage</b><span>Écran, fichiers et chat, sans audio ni vidéo</span></label>
+          </div>
+          <div class="row" id="devRow">
             <label class="chk"><input type="checkbox" id="useCam" checked> Caméra</label>
             <label class="chk"><input type="checkbox" id="useMic" checked> Micro</label>
           </div>
@@ -320,6 +350,10 @@ td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
       <!-- ===== Réunion ===== -->
       <section id="meet" hidden>
         <div id="ctlbar" hidden><span id="ctlTxt"></span><button class="btn sm primary" id="ctlOk">Autoriser</button><button class="btn sm" id="ctlNo">Refuser</button><button class="btn sm danger" id="ctlStop">Arrêter le contrôle</button></div>
+        <div id="supHint" hidden><div class="card"><h2>Mode dépannage</h2>
+          <p class="sub">Si <b>vous êtes dépanné</b> : partagez votre écran. Seule la fenêtre ou l’écran que vous choisissez est visible.</p>
+          <button class="btn primary big" id="bSupShare"><span class="ico" data-i="screen"></span>Partager mon écran</button>
+          <p class="hint">Si <b>vous dépannez</b> : attendez que l’autre partage son écran. Vous pourrez alors pointer, dessiner, envoyer des fichiers ou demander le contrôle.</p></div></div>
         <div id="tiles"></div>
         <div id="ctrl">
           <button class="btn" id="cMic"><span class="ico" data-i="mic"></span><span class="hide-s">Micro</span></button>
@@ -346,7 +380,7 @@ td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
       <div class="pane chatpane" id="pane-chat">
         <div id="chatList"></div>
         <div id="emojiPop" hidden></div>
-        <div class="row" style="flex-wrap:nowrap"><button class="btn icon" id="bEmoji" title="Emoticônes" aria-label="Emoticônes" style="font-size:20px">😊</button><input class="inp" id="chatIn" style="flex:1" placeholder="Écrire un message…" autocomplete="off"><button class="btn primary icon" id="bSend" title="Envoyer"><span class="ico" data-i="send"></span></button></div>
+        <div class="row" style="flex-wrap:nowrap"><button class="btn icon" id="bClip" title="Envoyer mon presse-papiers à l’autre participant" aria-label="Envoyer mon presse-papiers" style="font-size:18px">📋</button><button class="btn icon" id="bEmoji" title="Emoticônes" aria-label="Emoticônes" style="font-size:20px">😊</button><input class="inp" id="chatIn" style="flex:1" placeholder="Écrire un message…" autocomplete="off"><button class="btn primary icon" id="bSend" title="Envoyer"><span class="ico" data-i="send"></span></button></div>
       </div>
 
       <div class="pane" id="pane-files" hidden>
@@ -458,6 +492,7 @@ td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
       <ul><li><b>Le lien, c’est la clé.</b> Envoyez-le par un canal de confiance et ne le publiez pas. L’organisateur peut verrouiller la réunion, admettre ou exclure des participants et régler leurs droits.</li>
       <li><b>Vérifiez votre interlocuteur :</b> l’onglet Connexion affiche un code de vérification à 6 chiffres. Comparez-le à voix haute : s’il est identique des deux côtés, personne ne s’est glissé entre vous.</li>
       <li><b>Masquer votre adresse IP :</b> cochez « Forcer le passage par le relais » dans les paramètres ; les participants ne voient alors que celle du relais.</li>
+      <li><b>Dépannage à distance :</b> la personne dépannée choisit ce qu’elle partage, accepte chaque demande de contrôle pour la session en cours, voit en permanence qui agit et peut tout arrêter d’un clic. Le pointeur laser et les dessins ne touchent jamais à son ordinateur.</li>
       <li>Même chiffrés, les relais peuvent savoir <i>qu’</i>une réunion a lieu à telle heure, jamais <i>ce qui</i> s’y dit.</li></ul></div>
     <button class="btn primary big" id="bInfoOk">J’ai compris</button>
   </div></div>
@@ -769,6 +804,8 @@ function onDcMessage(p, e) {
     case 'pong': p.rtt = Math.round(performance.now() - m.ts); break;
     case 'screen': p.screenWanted = !!m.on; showRemoteScreen(p, p.screenWanted && permsOf(p.id).screen); break;
     case 'ctl': onCtl(p, m); break;
+    case 'lz': case 'an': onAnnot(p, m); break;
+    case 'clip': if (permsOf(p.id).chat) addClip(p.name, String(m.text || '').slice(0, 20000)); break;
     case 'files': if (permsOf(p.id).files) setCatalog(p, m.list); break;
     case 'fadd': if (permsOf(p.id).files) addRemoteFile(p, m.meta); break;
     case 'frm': removeRemoteFile(p, m.fid); break;
@@ -871,12 +908,72 @@ async function startScreen() {
   const vt = st.getVideoTracks()[0]; if (!vt) return;
   try { vt.contentHint = 'detail'; } catch { /* ignoré */ }
   S.screen = st; vt.onended = stopScreen;
-  const t = addTile('tile-scr-me', 'Votre écran', st, true); t.classList.add('screen'); S.screenTile = t;
+  const t = addTile('tile-scr-me', 'Votre écran', st, true); t.classList.add('screen'); S.screenTile = t; t._ov = makeOverlay(t);
+  { const tb = document.createElement('div'); tb.className = 'tb'; const sw = document.createElement('button'); sw.className = 'btn sm'; sw.textContent = 'Changer de fenêtre'; sw.title = 'Choisir un autre écran ou une autre fenêtre à partager'; sw.onclick = e => { e.stopPropagation(); switchScreen(); }; tb.appendChild(sw); t.appendChild(tb); }
   $('#tiles').insertBefore(t, $('#tiles').firstChild);
   for (const p of S.peers.values()) { await attachLocal(p); }
   bcast({ t: 'screen', on: true });
   $('#cScreen').classList.add('on'); $('#cScreen').title = 'Arrêter le partage d’écran';
-  addChat('', 'Vous partagez votre écran', false, true);
+  addChat('', 'Vous partagez votre écran', false, true); syncSupHint();
+}
+async function switchScreen() {                       // autre écran ou autre fenêtre, sans couper le partage ni le contrôle
+  if (!S.screen) return;
+  let st; try { st = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 15 }, audio: false }); } catch { return; }
+  const vt = st.getVideoTracks()[0]; if (!vt) return;
+  try { vt.contentHint = 'detail'; } catch { /* ignoré */ }
+  const old = S.screen; S.screen = st; vt.onended = stopScreen;
+  if (S.screenTile) S.screenTile.querySelector('video').srcObject = st;
+  for (const p of S.peers.values()) { const tr = p.pc.getTransceivers()[2]; if (tr) tr.sender.replaceTrack(vt).catch(() => {}); }
+  old.getTracks().forEach(t => { t.onended = null; t.stop(); });
+  toast('Partage déplacé vers la nouvelle fenêtre');
+}
+/* ---- surcouche sur une tuile d'écran : pointeur laser et annotations (affichées chez les deux, jamais d'action sur le système) ---- */
+function makeOverlay(tile) {
+  const cv = document.createElement('canvas'); cv.className = 'ov'; tile.appendChild(cv);
+  const v = tile.querySelector('video'), strokes = [], lasers = new Map(); let raf = 0;
+  const rect = () => { const W = tile.clientWidth, H = tile.clientHeight, vw = v.videoWidth || 16, vh = v.videoHeight || 9, sc = Math.min(W / vw, H / vh), w = vw * sc, h = vh * sc; return { l: (W - w) / 2, t: (H - h) / 2, w, h }; };
+  const norm = e => { const b = cv.getBoundingClientRect(), r = rect(); const x = (e.clientX - b.left - r.l) / r.w, y = (e.clientY - b.top - r.t) / r.h; return x < 0 || x > 1 || y < 0 || y > 1 ? null : { x, y }; };
+  const draw = () => {
+    raf = 0; const dpr = window.devicePixelRatio || 1, W = tile.clientWidth, H = tile.clientHeight;
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
+    const r = rect(), now = Date.now(); c.lineCap = 'round'; c.lineJoin = 'round'; c.lineWidth = Math.max(3, W / 220);
+    for (let i = strokes.length - 1; i >= 0; i--) { const s = strokes[i]; const age = now - s.t; if (!s.open && age > 6000) { strokes.splice(i, 1); continue; } }
+    for (const s of strokes) {
+      const age = now - s.t; c.globalAlpha = s.open ? 1 : Math.max(0, Math.min(1, (6000 - age) / 2000));
+      c.strokeStyle = s.color; c.beginPath();
+      s.pts.forEach(([x, y], i) => { const px = r.l + x * r.w, py = r.t + y * r.h; i ? c.lineTo(px, py) : c.moveTo(px, py); });
+      if (s.pts.length === 1) c.lineTo(r.l + s.pts[0][0] * r.w + .1, r.t + s.pts[0][1] * r.h); c.stroke();
+    }
+    for (const [id, l] of lasers) {
+      if (now - l.t > 1500) { lasers.delete(id); continue; }
+      const px = r.l + l.x * r.w, py = r.t + l.y * r.h; c.globalAlpha = 1;
+      const g = c.createRadialGradient(px, py, 0, px, py, 22); g.addColorStop(0, 'rgba(255,40,40,.95)'); g.addColorStop(.35, 'rgba(255,40,40,.5)'); g.addColorStop(1, 'rgba(255,40,40,0)');
+      c.fillStyle = g; c.beginPath(); c.arc(px, py, 22, 0, 7); c.fill();
+    }
+    c.globalAlpha = 1;
+    if (strokes.length || lasers.size) raf = requestAnimationFrame(draw);
+  };
+  const kick = () => { if (!raf) raf = requestAnimationFrame(draw); };
+  return {
+    cv, norm,
+    laser(id, x, y, on) { if (on) lasers.set(id, { x, y, t: Date.now() }); else lasers.delete(id); kick(); },
+    stroke(id, a, x, y, color) {
+      let s = [...strokes].reverse().find(q => q.id === id && q.open);
+      if (a === 's' || !s) { if (a === 'e') return; if (strokes.length > 40) strokes.shift(); s = { id, pts: [], open: true, t: Date.now(), color: color || '#ff9f1a' }; strokes.push(s); }
+      if (s.pts.length < 600 && a !== 'e') s.pts.push([x, y]);
+      s.t = Date.now(); if (a === 'e') s.open = false; kick();
+    },
+    clear(id) { for (let i = strokes.length - 1; i >= 0; i--) if (!id || strokes[i].id === id) strokes.splice(i, 1); kick(); }
+  };
+}
+const clamp01 = n => Math.min(1, Math.max(0, Number(n) || 0));
+function onAnnot(p, m) {                              // laser / dessin reçu de l'aidant, affiché sur notre propre écran partagé
+  if (!permsOf(p.id).ctl || !S.screen || !S.screenTile || !S.screenTile._ov) return;
+  const o = S.screenTile._ov;
+  if (m.t === 'lz') o.laser(p.id, clamp01(m.x), clamp01(m.y), !!m.on);
+  else if (m.a === 'clr') o.clear(p.id);
+  else if (['s', 'm', 'e'].includes(m.a)) o.stroke(p.id, m.a, clamp01(m.x), clamp01(m.y), '#ff9f1a');
 }
 function stopScreen() {
   if (!S.screen) return;
@@ -886,7 +983,7 @@ function stopScreen() {
   bcast({ t: 'screen', on: false });
   endControl(true); $('#ctlbar').hidden = true; S.ctlReq = null;
   $('#cScreen').classList.remove('on'); $('#cScreen').title = 'Partager votre écran';
-  addChat('', 'Vous avez arrêté le partage d’écran', false, true);
+  addChat('', 'Vous avez arrêté le partage d’écran', false, true); syncSupHint();
 }
 function showRemoteScreen(p, on) {
   p.screenOn = on;
@@ -896,14 +993,36 @@ function showRemoteScreen(p, on) {
     const b = document.createElement('button'); b.className = 'btn sm'; b.setAttribute('data-ctl', '1'); b.textContent = 'Demander le contrôle';
     b.title = 'Prendre la main sur l’ordinateur de ' + p.name + ' (avec son accord)';
     b.onclick = e => { e.stopPropagation(); toggleControl(p); };
-    tb.appendChild(b); t.appendChild(tb);
+    t._ov = makeOverlay(t); p.tool = 'none';
+    const mk = (txt, title, fn) => { const x = document.createElement('button'); x.className = 'btn sm'; x.textContent = txt; x.title = title; x.onclick = e => { e.stopPropagation(); fn(x); }; return x; };
+    const setTool = tool => {
+      p.tool = p.tool === tool ? 'none' : tool; if (p.ctl) p.tool = 'none';
+      t.classList.toggle('tool', p.tool !== 'none'); bL.classList.toggle('on', p.tool === 'laser'); bD.classList.toggle('on', p.tool === 'draw'); bC.hidden = p.tool !== 'draw';
+    };
+    const bL = mk('Pointeur', 'Montrer un endroit avec un pointeur laser, sans prendre la main', () => setTool('laser'));
+    const bD = mk('Dessiner', 'Dessiner sur l’écran partagé (le dessin s’efface seul)', () => setTool('draw'));
+    const bC = mk('Effacer', 'Effacer les dessins', () => { t._ov.clear('me'); dcSend(p, { t: 'an', a: 'clr' }); }); bC.hidden = true;
+    p.setTool = setTool;
+    const bK = document.createElement('span'); bK.className = 'tb'; bK.hidden = true; bK.style.position = 'static'; p.keysEl = bK;
+    for (const [lab, keys] of [['Ctrl+Alt+Suppr', [['Control', 'ControlLeft'], ['Alt', 'AltLeft'], ['Delete', 'Delete']]], ['Alt+Tab', [['Alt', 'AltLeft'], ['Tab', 'Tab']]], ['Windows', [['Meta', 'MetaLeft']]], ['Échap', [['Escape', 'Escape']]]]) bK.appendChild(mk(lab, 'Envoyer ' + lab + ' (le navigateur ne peut pas transmettre cette touche directement)', () => sendCombo(p, keys)));
+    const ov = t._ov.cv; let drawing = false, lastL = 0;
+    ov.addEventListener('pointerdown', e => { if (p.tool !== 'draw') return; const q = t._ov.norm(e); if (!q) return; drawing = true; ov.setPointerCapture(e.pointerId); t._ov.stroke('me', 's', q.x, q.y, '#ff9f1a'); dcSend(p, { t: 'an', a: 's', ...q }); });
+    ov.addEventListener('pointermove', e => {
+      const q = t._ov.norm(e); const n = performance.now();
+      if (p.tool === 'draw' && drawing && q) { if (n - lastL < 16) return; lastL = n; t._ov.stroke('me', 'm', q.x, q.y, '#ff9f1a'); dcSend(p, { t: 'an', a: 'm', ...q }); }
+      else if (p.tool === 'laser') { if (n - lastL < 30) return; lastL = n; if (q) { t._ov.laser('me', q.x, q.y, true); dcSend(p, { t: 'lz', on: true, ...q }); } }
+    });
+    const up = e => { if (drawing) { drawing = false; t._ov.stroke('me', 'e', 0, 0); dcSend(p, { t: 'an', a: 'e', x: 0, y: 0 }); } };
+    ov.addEventListener('pointerup', up); ov.addEventListener('pointercancel', up);
+    ov.addEventListener('pointerleave', () => { if (p.tool === 'laser') { t._ov.laser('me', 0, 0, false); dcSend(p, { t: 'lz', on: false, x: 0, y: 0 }); } });
+    tb.append(bL, bD, bC, bK, b); t.appendChild(tb);
     t.ondblclick = () => { if (!p.ctl && t.requestFullscreen) t.requestFullscreen().catch(() => {}); };
     bindCtl(p, t);
     $('#tiles').insertBefore(t, $('#tiles').firstChild);
-    addChat('', p.name + ' partage son écran', false, true);
+    addChat('', p.name + ' partage son écran', false, true); syncSupHint();
   } else if (!on && p.screenTile) {
     p.screenTile.remove(); p.screenTile = null; p.ctl = false; p.ctlPending = false;
-    addChat('', p.name + ' a arrêté le partage d’écran', false, true);
+    addChat('', p.name + ' a arrêté le partage d’écran', false, true); syncSupHint();
   }
 }
 
@@ -915,6 +1034,8 @@ function updCtlBtn(p) {
   const t = p.screenTile; if (!t) return; const b = t.querySelector('[data-ctl]'); if (!b) return;
   b.textContent = p.ctl ? 'Arrêter le contrôle' : p.ctlPending ? 'En attente de l’accord…' : 'Demander le contrôle';
   b.classList.toggle('danger', !!p.ctl); t.classList.toggle('ctl', !!p.ctl);
+  if (p.keysEl) p.keysEl.hidden = !p.ctl;
+  if (p.ctl && p.tool && p.tool !== 'none' && p.setTool) p.setTool(p.tool);
 }
 function toggleControl(p) {
   if (!permsOf(S.myId).ctl) { toast('L’hôte n’autorise pas la demande de contrôle.'); return; }
@@ -936,6 +1057,12 @@ function bindCtl(p, tile) {
   v.addEventListener('wheel', e => { if (p.ctl) { e.preventDefault(); snd({ k: 'wh', dx: e.deltaX, dy: e.deltaY }); } }, { passive: false });
   v.addEventListener('contextmenu', e => { if (p.ctl) e.preventDefault(); });
   for (const [ev, k] of [['keydown', 'kd'], ['keyup', 'ku']]) tile.addEventListener(ev, e => { if (p.ctl) { e.preventDefault(); snd({ k, key: String(e.key).slice(0, 20), code: String(e.code).slice(0, 20), ctrl: e.ctrlKey, alt: e.altKey, shift: e.shiftKey, meta: e.metaKey }); } });
+}
+function sendCombo(p, keys) {
+  if (!p.ctl) return;
+  const st = { ctrl: false, alt: false, shift: false, meta: false }, ev = (k, key, code) => dcSend(p, { t: 'ctl', a: 'ev', e: { k, key, code, ...st } });
+  for (const [key, code] of keys) { if (key === 'Control') st.ctrl = true; if (key === 'Alt') st.alt = true; if (key === 'Meta') st.meta = true; ev('kd', key, code); }
+  for (const [key, code] of [...keys].reverse()) { ev('ku', key, code); if (key === 'Control') st.ctrl = false; if (key === 'Alt') st.alt = false; if (key === 'Meta') st.meta = false; }
 }
 function showCtlBar(mode, p) {
   const bar = $('#ctlbar'); bar.hidden = false;
@@ -971,7 +1098,10 @@ function onCtl(p, m) {
     if (!['mm', 'md', 'mu', 'wh', 'kd', 'ku'].includes(ev.k)) return;
     if (hasNative()) { try { window.lusNative.inject(ev); } catch (er) { log('Injection impossible : ' + er.message, 'ko'); } return; }
     if (ev.k === 'mm' || ev.k === 'md' || ev.k === 'mu') {
-      const r = $('#rptr'); r.hidden = false; r.style.left = Math.round(ev.x * innerWidth) + 'px'; r.style.top = Math.round(ev.y * innerHeight) + 'px';
+      const r = $('#rptr'); r.hidden = false;
+      const tl = S.screenTile, vb = tl ? tl.getBoundingClientRect() : { left: 0, top: 0, width: innerWidth, height: innerHeight }, vv = tl ? tl.querySelector('video') : null;
+      const vw = (vv && vv.videoWidth) || 16, vh = (vv && vv.videoHeight) || 9, sc = Math.min(vb.width / vw, vb.height / vh), cw = vw * sc, ch = vh * sc;
+      r.style.left = Math.round(vb.left + (vb.width - cw) / 2 + ev.x * cw) + 'px'; r.style.top = Math.round(vb.top + (vb.height - ch) / 2 + ev.y * ch) + 'px';
       r.querySelector('b').textContent = p.name;
       if (ev.k === 'md') { const i = r.querySelector('i'); i.classList.remove('click'); void i.offsetWidth; i.classList.add('click'); }
     }
@@ -1160,6 +1290,16 @@ function addChat(who, text, mine, sys) {
   const box = $('#chatList'); box.appendChild(d); box.scrollTop = box.scrollHeight;
   if (!mine && !sys) bump('chat', who, text.length > 60 ? text.slice(0, 57) + '…' : text);
 }
+const currentMode = () => ($('input[name=mode]:checked') || {}).value || 'meet';
+function setMode(m) {
+  $$('input[name=mode]').forEach(i => { i.checked = i.value === m; i.closest('.mode').classList.toggle('on', i.checked); });
+  $('#devRow').hidden = m === 'support';
+}
+$$('input[name=mode]').forEach(i => i.addEventListener('change', () => setMode(currentMode())));
+function syncSupHint() {
+  const on = S.mode === 'support' && S.inRoom && !S.screen && ![...S.peers.values()].some(p => p.screenTile);
+  $('#supHint').hidden = !on;
+}
 const SMILEYS = [[':)', '🙂'], [':-)', '🙂'], [':D', '😄'], [':-D', '😄'], [';)', '😉'], [';-)', '😉'], [':(', '🙁'], [':-(', '🙁'], [':p', '😛'], [':P', '😛'], [':o', '😮'], [':O', '😮'], ['<3', '❤️'], ['xD', '😆'], [':\'(', '😢']];
 function emojify(t) { return t.split(/(\s+)/).map(w => { const m = SMILEYS.find(x => x[0] === w); return m ? m[1] : w; }).join(''); }
 const EMOJIS = '😀 😃 😄 😁 😆 😅 😂 🤣 🙂 😉 😊 😇 🥰 😍 😘 😋 😛 😜 🤪 🤗 🤔 🤨 😐 😶 🙄 😏 😬 😌 😴 🤤 😷 🤒 🤯 🥳 😎 🤓 😕 🙁 😮 😲 😳 🥺 😢 😭 😱 😤 😡 🙏 👍 👎 👌 ✌️ 🤞 👏 🙌 💪 👋 🤝 👀 🔥 ✨ 🎉 🎂 ☕ 🍻 ❤️ 💔 💯 ✅ ❌ ⚠️ ❓ ❗ 💡 📎 📞 🕐 🌞 🌧️'.split(' ');
@@ -1172,6 +1312,25 @@ function insertEmoji(e) {
   i.value = i.value.slice(0, a) + e + i.value.slice(z);
   const c = a + e.length; try { i.setSelectionRange(c, c); } catch {}
   i.focus();
+}
+function addClip(who, text) {
+  const d = document.createElement('div'); d.className = 'msg';
+  const w = document.createElement('div'); w.className = 'who'; w.textContent = '📋 Presse-papiers de ' + who; d.appendChild(w);
+  const c = document.createElement('div'); c.className = 'clipmsg';
+  const pre = document.createElement('pre'); pre.textContent = text.length > 600 ? text.slice(0, 600) + '…' : text;
+  const b = document.createElement('button'); b.className = 'btn sm primary'; b.textContent = 'Copier dans mon presse-papiers';
+  b.onclick = async () => { try { await navigator.clipboard.writeText(text); toast('Copié'); } catch { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast('Copié'); } catch { toast('Copie impossible : sélectionnez le texte à la main'); } ta.remove(); } };
+  c.append(pre, b); d.appendChild(c);
+  const box = $('#chatList'); box.appendChild(d); box.scrollTop = box.scrollHeight;
+  bump('chat', who, 'a envoyé son presse-papiers');
+}
+async function sendClip() {
+  if (!permsOf(S.myId).chat) { toast('L’hôte a désactivé le chat pour vous.'); return; }
+  let t = '';
+  try { t = await navigator.clipboard.readText(); } catch { t = ''; }
+  if (!t) { toast('Presse-papiers vide ou lecture refusée : autorisez-la dans le navigateur, ou collez votre texte dans le chat.', 5000); return; }
+  t = t.slice(0, 20000); bcast({ t: 'clip', text: t });
+  addChat('', 'Vous avez envoyé votre presse-papiers (' + t.length + ' caractères)', false, true);
 }
 function sendChat() {
   const t = $('#chatIn').value.trim(); if (!t) return;
@@ -1385,8 +1544,8 @@ function updateStatus() {
   if (!S.inRoom) { dot.className = 'dot'; txt.textContent = 'Hors réunion'; return; }
   const live = [...S.peers.values()].filter(p => p.pc.connectionState === 'connected');
   const relayed = live.some(p => p.routeCls === 'warn');
-  if (!live.length) { dot.className = 'dot warn'; txt.textContent = 'Réunion · en attente de participants…'; return; }
-  dot.className = 'dot ok'; txt.textContent = 'Réunion · ' + (live.length + 1) + ' participants' + (relayed ? ' · via relais' : ' · liaison directe');
+  if (!live.length) { dot.className = 'dot warn'; txt.textContent = (S.mode === 'support' ? 'Dépannage' : 'Réunion') + ' · en attente de participants…'; return; }
+  dot.className = 'dot ok'; txt.textContent = (S.mode === 'support' ? 'Dépannage' : 'Réunion') + ' · ' + (live.length + 1) + ' participants' + (relayed ? ' · via relais' : ' · liaison directe');
 }
 function renderConn() {
   updateStatus();
@@ -1443,8 +1602,8 @@ async function statsLoop() {
 /* ============ Entrée / sortie de réunion ============ */
 function parseSecret(s) {                       // « secret » ou « secret.empreinte-de-l-hôte » (avec ou sans lien devant)
   s = (s || '').trim(); if (s.includes('#')) s = s.split('#').pop();
-  const [a, f] = s.split('.');
-  try { const b = ub64u(a); if (b.length === 16) return { secret: b, hostfp: /^[A-Za-z0-9_-]{22}$/.test(f || '') ? f : null }; } catch { /* invalide */ }
+  const [a, f, m] = s.split('.');
+  try { const b = ub64u(a); if (b.length === 16) return { secret: b, hostfp: /^[A-Za-z0-9_-]{22}$/.test(f || '') ? f : null, mode: m === 's' ? 'support' : 'meet' }; } catch { /* invalide */ }
   return null;
 }
 async function turnServers() {
@@ -1457,8 +1616,9 @@ async function turnServers() {
   const sig = new Uint8Array(await crypto.subtle.sign('HMAC', k, enc.encode(user)));
   return [{ urls, username: user, credential: b64(sig) }];
 }
-async function enter(secret, hostfp) {
+async function enter(secret, hostfp, mode) {
   if (S.inRoom) return;
+  S.mode = mode === 'support' ? 'support' : 'meet'; document.body.classList.toggle('support', S.mode === 'support');
   saveSettings();
   if (!(await schnorrReady)) { toast('Bibliothèque de signature indisponible (CDN bloqué ?). Voir Paramètres et tests.', 7000); return; }
   const relays = lines('#setRelays');
@@ -1479,7 +1639,7 @@ async function enter(secret, hostfp) {
   $('#home').hidden = true; $('#meet').hidden = false; $('#bSide').hidden = false; $('#settings').hidden = true; $('#bSettings').classList.remove('on');
   selectTab('chat');
   if (window.matchMedia && matchMedia('(max-width:760px),(max-height:500px) and (pointer:coarse)').matches) { $('#side').hidden = true; $('#bSide').classList.remove('on'); }   // téléphone : on voit d'abord les vidéos
-  const tok = b64u(secret) + (S.hostfp ? '.' + S.hostfp : '');
+  const tok = b64u(secret) + (S.hostfp || S.mode === 'support' ? '.' + (S.hostfp || '') : '') + (S.mode === 'support' ? '.s' : '');
   const link = location.href.split('#')[0] + '#' + tok;
   $('#invCode').textContent = link;
   $('#invHint').textContent = location.protocol === 'file:'
@@ -1493,7 +1653,7 @@ async function enter(secret, hostfp) {
   if (!S.isHost) setTimeout(() => { if (S.inRoom && ![...S.peers.values()].length) toast('Personne n’est encore connecté. Si la réunion est verrouillée, attendez que l’hôte vous admette.', 7000); }, 15000);
 
   updateCtrl(); renderConn(); renderFiles();
-  await startLocalMedia($('#useCam').checked, $('#useMic').checked);
+  if (S.mode === 'meet') await startLocalMedia($('#useCam').checked, $('#useMic').checked); else { updateCtrl(); syncSupHint(); }
   for (const u of relays) connectRelay(u);
   const hello = () => { if (![...S.peers.values()].some(p => p.pc.connectionState === 'connected')) send({ t: 'hello' }); };
   // « hello » espacé de plus en plus : les relais publics bannissent les clients trop bavards
@@ -1584,14 +1744,15 @@ $('#bTest').onclick = runTests;
 $('#bDefaults').onclick = () => { $('#setRelays').value = DEF.relays; $('#setStun').value = DEF.stun; $('#setTurn').value = DEF.turn; $('#setTurnMode').value = 'secret'; $('#setForce').checked = false; saveSettings(); toast('Valeurs par défaut rétablies'); };
 ['#setRelays', '#setStun', '#setTurn', '#setTurnMode', '#setTurnA', '#setTurnB', '#setForce', '#setRemember', '#name', '#useCam', '#useMic'].forEach(s => { $(s).addEventListener('change', saveSettings); $(s).addEventListener('input', saveSettings); });
 $('#bCreate').onclick = async () => {
-  try { const k = await makeHostKey(), fp = await hostFpOf(k.pub); ls.set('hk.' + fp, JSON.stringify({ pub: k.pub, priv: k.privJwk })); enter(crypto.getRandomValues(new Uint8Array(16)), fp); }
+  try { const k = await makeHostKey(), fp = await hostFpOf(k.pub); ls.set('hk.' + fp, JSON.stringify({ pub: k.pub, priv: k.privJwk })); enter(crypto.getRandomValues(new Uint8Array(16)), fp, currentMode()); }
   catch (e) { toast('Création impossible : ' + e.message); }
 };
-$('#bJoin').onclick = () => { const r = parseSecret($('#joinIn').value); r ? enter(r.secret, r.hostfp) : toast('Lien ou secret invalide.'); };
+$('#bJoin').onclick = () => { const r = parseSecret($('#joinIn').value); r ? enter(r.secret, r.hostfp, r.mode) : toast('Lien ou secret invalide.'); };
 $('#joinIn').onkeydown = e => { if (e.key === 'Enter') $('#bJoin').click(); };
 $('#cMic').onclick = () => toggleTrack('audio');
 $('#cCam').onclick = () => toggleTrack('video');
 if (!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia)) $('#cScreen').hidden = true;   // iPhone / Android : pas de partage d'écran dans le navigateur
+$('#bSupShare').onclick = () => startScreen();
 $('#cScreen').onclick = () => (S.screen ? stopScreen() : startScreen());
 $('#ctlOk').onclick = () => { const p = S.peers.get(S.ctlReq); S.ctlReq = null; if (!p || !S.screen) { $('#ctlbar').hidden = true; return; } S.ctl = p.id; dcSend(p, { t: 'ctl', a: 'grant', native: hasNative() }); showCtlBar('active', p); };
 $('#ctlNo').onclick = () => { const p = S.peers.get(S.ctlReq); S.ctlReq = null; $('#ctlbar').hidden = true; if (p) dcSend(p, { t: 'ctl', a: 'deny' }); };
@@ -1603,6 +1764,7 @@ $('#bSideX').onclick = sideOff;
 $('#cLeave').onclick = leave;
 $$('.stab').forEach(b => { b.onclick = () => selectTab(b.dataset.tab); });
 $('#bSend').onclick = sendChat;
+$('#bClip').onclick = sendClip;
 $('#bEmoji').onclick = () => { const p = $('#emojiPop'); p.hidden = !p.hidden; };
 const openInfo = on => { $('#info').hidden = !on; if (on) $('#info .ib').scrollTop = 0; };
 $('#bOpenInfo').onclick = () => openInfo(true); $('#bOpenInfo2').onclick = () => openInfo(true);
@@ -1643,11 +1805,11 @@ document.addEventListener('drop', e => { if (!S.inRoom || !hasFiles(e)) return; 
 
 loadSettings();
 { const nt = ls.get('notice'); if (nt) { ls.del('notice'); setTimeout(() => toast(nt, 9000), 300); } }
-if (location.hash.length > 5) { $('#joinIn').value = location.hash; $('#bJoin').classList.add('primary'); $('#bCreate').classList.remove('primary'); }
+if (location.hash.length > 5) { $('#joinIn').value = location.hash; { const r = parseSecret(location.hash); if (r) setMode(r.mode); } $('#bJoin').classList.add('primary'); $('#bCreate').classList.remove('primary'); }
 renderFiles(); updateStatus();
 
 /* point d'entrée pour les tests automatisés (sans effet dans un navigateur) */
-if (globalThis.__LUS_TEST__) globalThis.__LUS_TEST__({ S, addChat, ensurePeer, setupDc, setupFdc, addLocalFiles, downloadFile, cancelTransfer, removeLocalFile, onDcMessage, sendCatalog, onCtl, toggleControl, showRemoteScreen, dcSend, makeHostKey, hostFpOf, loadHostKey, signHost, checkHostClaim, pushState, hostCmd, permsOf, kickPeer, admit, toggleLock, setPerm, allowed, leave, renderPeople });
+if (globalThis.__LUS_TEST__) globalThis.__LUS_TEST__({ S, addChat, onAnnot, makeOverlay, sendCombo, addClip, syncSupHint, ensurePeer, setupDc, setupFdc, addLocalFiles, downloadFile, cancelTransfer, removeLocalFile, onDcMessage, sendCatalog, onCtl, toggleControl, showRemoteScreen, dcSend, makeHostKey, hostFpOf, loadHostKey, signHost, checkHostClaim, pushState, hostCmd, permsOf, kickPeer, admit, toggleLock, setPerm, allowed, leave, renderPeople });
 </script>
 </body>
 </html>

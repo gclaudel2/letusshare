@@ -236,13 +236,57 @@ td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
   .tile{max-height:calc(100dvh - 150px)}
   .card{padding:14px}
 }
+
+/* ---- notification discrète ---- */
+#notice{position:fixed;left:50%;top:calc(58px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:8px;max-width:min(92vw,420px);padding:7px 14px 7px 11px;border-radius:999px;background:var(--panel2);color:var(--fg);border:1px solid var(--accent);box-shadow:var(--shadow);font-size:13px;cursor:pointer;animation:nin .22s ease-out}
+#notice .ico svg{width:16px;height:16px;color:var(--accent)}
+#notice span.t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+#notice b{font-weight:600}
+@keyframes nin{from{opacity:0;transform:translate(-50%,-8px)}to{opacity:1;transform:translate(-50%,0)}}
+/* ---- emoticônes ---- */
+.pane.chatpane{position:relative}
+#emojiPop{position:absolute;left:12px;right:12px;bottom:62px;z-index:5;background:var(--panel2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:8px;max-height:220px;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:2px}
+#emojiPop button{border:0;background:none;font-size:23px;line-height:1;height:38px;border-radius:8px;cursor:pointer;padding:0;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+#emojiPop button:hover{background:var(--accent-soft)}
+.msg .big{font-size:34px;line-height:1.15}
+.msg,.msg .big{font-family:var(--font),"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji"}
+/* ---- page d'explication ---- */
+#info{position:fixed;inset:0;z-index:90;background:var(--bg);display:flex;flex-direction:column}
+#info .ih{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:max(10px,env(safe-area-inset-top,0px)) 14px 10px;background:var(--panel);border-bottom:1px solid var(--line)}
+#info .ib{flex:1;overflow:auto;padding:18px 14px calc(30px + env(safe-area-inset-bottom,0px))}
+#info .iw{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px;line-height:1.55;font-size:15px}
+#info h2{font-size:22px;line-height:1.25}
+#info h3{font-size:16px;margin-bottom:2px}
+#info p{margin:0}
+#info .lead{font-size:16px;color:var(--muted)}
+#info .hero{display:flex;gap:12px;align-items:flex-start;background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:14px}
+#info .hero .ico svg{width:26px;height:26px;color:var(--accent)}
+#info .steps{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+#info .st{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+#info .st .n{width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font-weight:600;font-size:13px}
+#info .st p{font-size:14px;color:var(--muted)}
+#info .who{display:grid;gap:10px}
+#info .wc{background:var(--panel2);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;display:grid;gap:6px}
+#info .wc.ext{border-left-color:var(--warn)}
+#info .wc.dir{border-left-color:var(--ok)}
+#info .wc h3{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#info .tg{font-size:11.5px;font-weight:500;border:1px solid var(--line);border-radius:999px;padding:0 8px;color:var(--muted)}
+#info .see,#info .nsee{font-size:14px;display:flex;gap:8px}
+#info .see::before{content:"👁";flex:none}
+#info .nsee::before{content:"🔒";flex:none}
+#info .note{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:6px}
+#info ul{margin:0;padding-left:20px;display:grid;gap:5px}
+#info .flow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:13px;text-align:center}
+#info .flow .nd{border:2px solid var(--ok);border-radius:10px;padding:8px 12px;font-weight:500}
+#info .flow .ar{color:var(--ok);font-weight:600}
+#info .flow .lbl{width:100%;color:var(--muted);font-size:12.5px}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
 </head>
 <body>
 <div id="app">
   <div class="bar" id="topbar">
-    <div class="brand"><i class="ico" data-i="share"></i><span>Let Us Share</span><span class="tag">prototype v4.0</span></div>
+    <div class="brand"><i class="ico" data-i="share"></i><span>Let Us Share</span><span class="tag">prototype v4.1</span></div>
     <span class="pill" id="statusPill"><i class="dot" id="statusDot"></i><span id="statusTxt">Hors réunion</span></span>
     <div class="spacer"></div>
     <button class="btn" id="bSide" title="Afficher ou masquer le panneau Chat / Fichiers / Connexion" hidden><span class="ico" data-i="sidebar"></span><span class="hide-s">Panneau</span></button>
@@ -268,6 +312,7 @@ td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
           <div class="or">ou rejoindre une réunion</div>
           <div class="row"><input class="inp" id="joinIn" style="flex:1" placeholder="Coller le lien ou le secret de la réunion" autocomplete="off"><button class="btn" id="bJoin">Rejoindre</button></div>
           <div class="secure"><span class="ico" data-i="lock"></span><span>Chiffré de bout en bout. Seules les personnes qui ont le secret de la réunion peuvent y entrer.</span></div>
+          <div class="row"><button class="lnk" id="bOpenInfo">🔒 Que voient les serveurs ? Comment c’est protégé ?</button></div>
           <div class="row"><button class="lnk" id="bOpenSettings">Paramètres et tests réseau…</button></div>
         </div>
       </section>
@@ -300,7 +345,8 @@ td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
 
       <div class="pane chatpane" id="pane-chat">
         <div id="chatList"></div>
-        <div class="row" style="flex-wrap:nowrap"><input class="inp" id="chatIn" style="flex:1" placeholder="Écrire un message…" autocomplete="off"><button class="btn primary icon" id="bSend" title="Envoyer"><span class="ico" data-i="send"></span></button></div>
+        <div id="emojiPop" hidden></div>
+        <div class="row" style="flex-wrap:nowrap"><button class="btn icon" id="bEmoji" title="Emoticônes" aria-label="Emoticônes" style="font-size:20px">😊</button><input class="inp" id="chatIn" style="flex:1" placeholder="Écrire un message…" autocomplete="off"><button class="btn primary icon" id="bSend" title="Envoyer"><span class="ico" data-i="send"></span></button></div>
       </div>
 
       <div class="pane" id="pane-files" hidden>
@@ -322,6 +368,7 @@ td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
           <div class="code" id="invCode"></div>
           <div class="row"><button class="btn sm" id="bCopyLink"><span class="ico" data-i="copy"></span>Copier le lien</button><button class="btn sm" id="bCopySecret"><span class="ico" data-i="copy"></span>Copier le secret</button></div>
         </div>
+        <div class="box"><button class="lnk" id="bOpenInfo2" style="text-align:left">🔒 Que voient les serveurs ? Comment c’est protégé ?</button></div>
         <div class="box"><div class="sh"><span>Ma connexion</span></div><div id="connInfo"></div></div>
         <div class="box"><div class="sh"><span>Participants</span></div><div id="connPeers"></div></div>
         <details class="box"><summary>Journal technique</summary><div id="log"></div></details>
@@ -365,6 +412,56 @@ td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
     </aside>
   </div>
 </div>
+<div id="notice" hidden role="status" aria-live="polite"></div>
+<section id="info" hidden aria-label="Confidentialité et sécurité">
+  <div class="ih"><strong>Confidentialité et sécurité</strong><button class="btn icon" id="bInfoX" title="Fermer (Échap)" aria-label="Fermer"><span class="ico" data-i="x"></span></button></div>
+  <div class="ib"><div class="iw">
+    <h2>Rien de votre discussion ne passe par un serveur externe</h2>
+    <div class="hero"><span class="ico" data-i="lock"></span><p><b>En une phrase :</b> la vidéo, le son, le chat, les fichiers et l’écran partagé vont <b>directement d’un participant à l’autre</b>, chiffrés. Les serveurs ne servent qu’à mettre les gens en relation, et ils ne voient que du texte illisible.</p></div>
+
+    <div><h3>Le principe, en 3 temps</h3>
+    <div class="steps">
+      <div class="st"><span class="n">1</span><h3>Le lien secret</h3><p>Le lien contient un secret tiré au hasard, après le « # ». Votre navigateur <b>ne l’envoie jamais</b> à un serveur. Il sert à fabriquer les clés de chiffrement : seuls ceux qui ont le lien peuvent entrer.</p></div>
+      <div class="st"><span class="n">2</span><h3>La mise en relation</h3><p>Vos appareils s’échangent de petits messages (« je suis là », « voici comment me joindre ») via des relais publics. Ces messages sont <b>chiffrés avant l’envoi</b> : les relais transportent du texte incompréhensible.</p></div>
+      <div class="st"><span class="n">3</span><h3>La réunion</h3><p>Une fois en relation, les appareils se connectent <b>en direct</b> (WebRTC). Tout ce qui s’échange est chiffré de bout en bout, comme l’exigent tous les navigateurs.</p></div>
+    </div></div>
+
+    <div class="flow"><span class="lbl">Ce qui circule vraiment pendant la réunion</span>
+      <span class="nd">Vous</span><span class="ar">⟵ 🔒 vidéo · son · chat · fichiers · écran ⟶</span><span class="nd">Participant</span>
+      <span class="lbl">Aucun serveur au milieu. Si le réseau l’interdit (pare-feu d’entreprise), un relais transporte les mêmes paquets <b>déjà chiffrés</b>, sans pouvoir les lire.</span></div>
+
+    <div><h3>Qui voit quoi ?</h3>
+    <div class="who">
+      <div class="wc dir"><h3>Les autres participants <span class="tg">en direct</span></h3>
+        <div class="see">Ce que vous choisissez de partager (image, voix, messages, fichiers) et, en connexion directe, votre adresse IP.</div>
+        <div class="nsee">Rien d’autre : ni votre écran sans votre accord, ni vos fichiers non partagés. Le contrôle à distance exige votre accord explicite.</div></div>
+      <div class="wc ext"><h3>Les relais de signalisation (Nostr) <span class="tg">serveurs publics externes</span></h3>
+        <div class="see">Qu’un appareil s’est connecté à telle heure, la taille des messages, et votre adresse IP de connexion.</div>
+        <div class="nsee">Le contenu : tout est chiffré avec le secret du lien (AES‑256). Ni noms, ni vidéo, ni son, ni chat, ni fichiers. Un message modifié en route est rejeté.</div></div>
+      <div class="wc ext"><h3>Les serveurs STUN (Google, Cloudflare) <span class="tg">serveurs publics externes</span></h3>
+        <div class="see">Votre adresse IP publique, le temps de la question « quelle est mon adresse vue d’Internet ? ».</div>
+        <div class="nsee">Tout ce qui concerne la réunion : lien, participants, contenu. Ils ne les connaissent pas.</div></div>
+      <div class="wc"><h3>Le relais TURN (secours) <span class="tg">votre propre serveur</span></h3>
+        <div class="see">Seulement si la connexion directe est impossible : des paquets déjà chiffrés, leur volume et les adresses IP.</div>
+        <div class="nsee">Le contenu : les clés de chiffrement ne passent jamais par lui. Il ne peut ni écouter, ni voir, ni modifier. Ses accès sont temporaires.</div></div>
+      <div class="wc ext"><h3>L’hébergeur de la page, polices et bibliothèques <span class="tg">au chargement</span></h3>
+        <div class="see">Que la page a été téléchargée (adresse IP), comme pour n’importe quel site.</div>
+        <div class="nsee">Tout de la réunion : la page est chargée avant, et ne leur envoie rien ensuite.</div></div>
+    </div></div>
+
+    <div class="note"><h3>Rien n’est conservé</h3>
+      <ul><li>Pas de compte, pas d’e‑mail, pas de base de données : il n’y a personne chez qui stocker.</li>
+      <li>Le chat disparaît quand vous fermez la page. Les clés sont jetables, créées à chaque réunion.</li>
+      <li>Un fichier partagé reste sur l’appareil de celui qui l’envoie ; il est transmis directement à qui le demande, et seulement tant que l’expéditeur est dans la réunion.</li></ul></div>
+
+    <div class="note"><h3>Pour rester prudent</h3>
+      <ul><li><b>Le lien, c’est la clé.</b> Envoyez-le par un canal de confiance et ne le publiez pas. L’organisateur peut verrouiller la réunion, admettre ou exclure des participants et régler leurs droits.</li>
+      <li><b>Vérifiez votre interlocuteur :</b> l’onglet Connexion affiche un code de vérification à 6 chiffres. Comparez-le à voix haute : s’il est identique des deux côtés, personne ne s’est glissé entre vous.</li>
+      <li><b>Masquer votre adresse IP :</b> cochez « Forcer le passage par le relais » dans les paramètres ; les participants ne voient alors que celle du relais.</li>
+      <li>Même chiffrés, les relais peuvent savoir <i>qu’</i>une réunion a lieu à telle heure, jamais <i>ce qui</i> s’y dit.</li></ul></div>
+    <button class="btn primary big" id="bInfoOk">J’ai compris</button>
+  </div></div>
+</section>
 <div id="rptr" hidden><i></i><b></b></div>
 <div id="toast" hidden></div>
 
@@ -1058,21 +1155,51 @@ function renderPeople() {
 function addChat(who, text, mine, sys) {
   const d = document.createElement('div'); d.className = 'msg' + (mine ? ' me' : '') + (sys ? ' sys' : '');
   if (!sys && who) { const w = document.createElement('div'); w.className = 'who'; w.textContent = who; d.appendChild(w); }
-  d.appendChild(document.createTextNode(text));
+  if (!sys && /^(?:\p{Extended_Pictographic}|\u200d|\ufe0f|\s){1,8}$/u.test(text)) { const e = document.createElement('div'); e.className = 'big'; e.textContent = text; d.appendChild(e); }
+  else d.appendChild(document.createTextNode(text));
   const box = $('#chatList'); box.appendChild(d); box.scrollTop = box.scrollHeight;
-  if (!mine && !sys) bump('chat');
+  if (!mine && !sys) bump('chat', who, text.length > 60 ? text.slice(0, 57) + '…' : text);
+}
+const SMILEYS = [[':)', '🙂'], [':-)', '🙂'], [':D', '😄'], [':-D', '😄'], [';)', '😉'], [';-)', '😉'], [':(', '🙁'], [':-(', '🙁'], [':p', '😛'], [':P', '😛'], [':o', '😮'], [':O', '😮'], ['<3', '❤️'], ['xD', '😆'], [':\'(', '😢']];
+function emojify(t) { return t.split(/(\s+)/).map(w => { const m = SMILEYS.find(x => x[0] === w); return m ? m[1] : w; }).join(''); }
+const EMOJIS = '😀 😃 😄 😁 😆 😅 😂 🤣 🙂 😉 😊 😇 🥰 😍 😘 😋 😛 😜 🤪 🤗 🤔 🤨 😐 😶 🙄 😏 😬 😌 😴 🤤 😷 🤒 🤯 🥳 😎 🤓 😕 🙁 😮 😲 😳 🥺 😢 😭 😱 😤 😡 🙏 👍 👎 👌 ✌️ 🤞 👏 🙌 💪 👋 🤝 👀 🔥 ✨ 🎉 🎂 ☕ 🍻 ❤️ 💔 💯 ✅ ❌ ⚠️ ❓ ❗ 💡 📎 📞 🕐 🌞 🌧️'.split(' ');
+(() => {
+  const pop = $('#emojiPop');
+  for (const e of EMOJIS) { const b = document.createElement('button'); b.type = 'button'; b.textContent = e; b.onmousedown = ev => ev.preventDefault(); b.onclick = () => insertEmoji(e); pop.appendChild(b); }
+})();
+function insertEmoji(e) {
+  const i = $('#chatIn'), a = i.selectionStart ?? i.value.length, z = i.selectionEnd ?? a;
+  i.value = i.value.slice(0, a) + e + i.value.slice(z);
+  const c = a + e.length; try { i.setSelectionRange(c, c); } catch {}
+  i.focus();
 }
 function sendChat() {
   const t = $('#chatIn').value.trim(); if (!t) return;
   if (!permsOf(S.myId).chat) { toast('L’hôte a désactivé le chat pour vous.'); return; }
-  bcast({ t: 'chat', text: t }); addChat('Moi', t, true); $('#chatIn').value = '';
+  const tx = emojify(t); $('#emojiPop').hidden = true;
+  bcast({ t: 'chat', text: tx }); addChat('Moi', tx, true); $('#chatIn').value = '';
 }
-function bump(tab) {
+let noticeT = 0;
+function notify(tab, who, text) {
+  const n = $('#notice'); n.textContent = '';
+  const i = document.createElement('span'); i.className = 'ico'; i.innerHTML = ICONS[tab === 'chat' ? 'chat' : 'paperclip'];
+  const t = document.createElement('span'); t.className = 't';
+  const b = document.createElement('b'); b.textContent = who; t.append(b, ' ' + text);
+  n.append(i, t); n.hidden = false; n.onclick = () => { n.hidden = true; selectTab(tab); };
+  clearTimeout(noticeT); noticeT = setTimeout(() => { n.hidden = true; }, 4500);
+}
+const baseTitle = document.title;
+document.addEventListener('visibilitychange', () => { if (!document.hidden) document.title = baseTitle; });
+function bump(tab, who, text) {
+  if (S.tab === tab && !$('#side').hidden && !document.hidden) return;
+  if (who) notify(tab, who, text);
+  if (document.hidden) document.title = '● ' + baseTitle;
   if (S.tab === tab && !$('#side').hidden) return;
   S.unread[tab]++; const b = $('#bd' + (tab === 'chat' ? 'Chat' : 'Files')); b.textContent = S.unread[tab]; b.hidden = false; syncCtlBadge();
 }
 function syncCtlBadge() { const n = S.unread.chat + S.unread.files, b = $('#bdCtl'); b.textContent = n; b.hidden = !n; }
 function selectTab(tab) {
+  $('#notice').hidden = true;
   S.tab = tab; $('#side').hidden = false; $('#bSide').classList.add('on');
   $$('.stab').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
   for (const t of ['chat', 'files', 'people', 'conn']) $('#pane-' + t).hidden = t !== tab;
@@ -1112,12 +1239,12 @@ function setCatalog(p, list) {
   for (const [k, f] of S.files) if (f.owner === p.id) S.files.delete(k);
   let n = 0;
   for (const m of Array.isArray(list) ? list : []) { const c = cleanMeta(m); S.files.set(p.id + ':' + c.fid, { ...c, owner: p.id, ownerName: p.name, avail: true }); n++; }
-  if (n) { bump('files'); addChat('', p.name + ' partage ' + n + ' fichier(s)', false, true); }
+  if (n) { bump('files', p.name, 'partage ' + n + ' fichier' + (n > 1 ? 's' : '')); addChat('', p.name + ' partage ' + n + ' fichier(s)', false, true); }
   schedule(renderFiles);
 }
 function addRemoteFile(p, meta) {
   const c = cleanMeta(meta); S.files.set(p.id + ':' + c.fid, { ...c, owner: p.id, ownerName: p.name, avail: true });
-  bump('files'); addChat('', p.name + ' a partagé « ' + c.name + ' » (' + fmtSize(c.size) + ')', false, true); schedule(renderFiles);
+  bump('files', p.name, 'a partagé « ' + c.name + ' »'); addChat('', p.name + ' a partagé « ' + c.name + ' » (' + fmtSize(c.size) + ')', false, true); schedule(renderFiles);
 }
 function removeRemoteFile(p, fid) { S.files.delete(p.id + ':' + String(fid)); schedule(renderFiles); }
 function setOwnerAvail(pid, v) { for (const f of S.files.values()) if (f.owner === pid) f.avail = v; schedule(renderFiles); }
@@ -1476,6 +1603,11 @@ $('#bSideX').onclick = sideOff;
 $('#cLeave').onclick = leave;
 $$('.stab').forEach(b => { b.onclick = () => selectTab(b.dataset.tab); });
 $('#bSend').onclick = sendChat;
+$('#bEmoji').onclick = () => { const p = $('#emojiPop'); p.hidden = !p.hidden; };
+const openInfo = on => { $('#info').hidden = !on; if (on) $('#info .ib').scrollTop = 0; };
+$('#bOpenInfo').onclick = () => openInfo(true); $('#bOpenInfo2').onclick = () => openInfo(true);
+$('#bInfoX').onclick = () => openInfo(false); $('#bInfoOk').onclick = () => openInfo(false);
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#info').hidden) openInfo(false); });
 $('#chatIn').onkeydown = e => { if (e.key === 'Enter') sendChat(); };
 $('#bCopyLink').onclick = () => { navigator.clipboard.writeText($('#invCode').textContent); toast('Lien copié'); };
 $('#bCopySecret').onclick = () => { navigator.clipboard.writeText($('#invCode').textContent.split('#').pop()); toast('Secret copié'); };
@@ -1515,7 +1647,7 @@ if (location.hash.length > 5) { $('#joinIn').value = location.hash; $('#bJoin').
 renderFiles(); updateStatus();
 
 /* point d'entrée pour les tests automatisés (sans effet dans un navigateur) */
-if (globalThis.__LUS_TEST__) globalThis.__LUS_TEST__({ S, ensurePeer, setupDc, setupFdc, addLocalFiles, downloadFile, cancelTransfer, removeLocalFile, onDcMessage, sendCatalog, onCtl, toggleControl, showRemoteScreen, dcSend, makeHostKey, hostFpOf, loadHostKey, signHost, checkHostClaim, pushState, hostCmd, permsOf, kickPeer, admit, toggleLock, setPerm, allowed, leave, renderPeople });
+if (globalThis.__LUS_TEST__) globalThis.__LUS_TEST__({ S, addChat, ensurePeer, setupDc, setupFdc, addLocalFiles, downloadFile, cancelTransfer, removeLocalFile, onDcMessage, sendCatalog, onCtl, toggleControl, showRemoteScreen, dcSend, makeHostKey, hostFpOf, loadHostKey, signHost, checkHostClaim, pushState, hostCmd, permsOf, kickPeer, admit, toggleLock, setPerm, allowed, leave, renderPeople });
 </script>
 </body>
 </html>

@@ -251,35 +251,35 @@ td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
 .msg .big{font-size:34px;line-height:1.15}
 .msg,.msg .big{font-family:var(--font),"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji"}
 /* ---- page d'explication ---- */
-#info{position:fixed;inset:0;z-index:90;background:var(--bg);display:flex;flex-direction:column}
-#info .ih{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:max(10px,env(safe-area-inset-top,0px)) 14px 10px;background:var(--panel);border-bottom:1px solid var(--line)}
-#info .ib{flex:1;overflow:auto;padding:18px 14px calc(30px + env(safe-area-inset-bottom,0px))}
-#info .iw{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px;line-height:1.55;font-size:15px}
-#info h2{font-size:22px;line-height:1.25}
-#info h3{font-size:16px;margin-bottom:2px}
-#info p{margin:0}
-#info .lead{font-size:16px;color:var(--muted)}
-#info .hero{display:flex;gap:12px;align-items:flex-start;background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:14px}
-#info .hero .ico svg{width:26px;height:26px;color:var(--accent)}
-#info .steps{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
-#info .st{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
-#info .st .n{width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font-weight:600;font-size:13px}
-#info .st p{font-size:14px;color:var(--muted)}
-#info .who{display:grid;gap:10px}
-#info .wc{background:var(--panel2);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;display:grid;gap:6px}
-#info .wc.ext{border-left-color:var(--warn)}
-#info .wc.dir{border-left-color:var(--ok)}
-#info .wc h3{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-#info .tg{font-size:11.5px;font-weight:500;border:1px solid var(--line);border-radius:999px;padding:0 8px;color:var(--muted)}
-#info .see,#info .nsee{font-size:14px;display:flex;gap:8px}
-#info .see::before{content:"👁";flex:none}
-#info .nsee::before{content:"🔒";flex:none}
-#info .note{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:6px}
-#info ul{margin:0;padding-left:20px;display:grid;gap:5px}
-#info .flow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:13px;text-align:center}
-#info .flow .nd{border:2px solid var(--ok);border-radius:10px;padding:8px 12px;font-weight:500}
-#info .flow .ar{color:var(--ok);font-weight:600}
-#info .flow .lbl{width:100%;color:var(--muted);font-size:12.5px}
+.ovl{position:fixed;inset:0;z-index:90;background:var(--bg);display:flex;flex-direction:column}
+.ovl .ih{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:max(10px,env(safe-area-inset-top,0px)) 14px 10px;background:var(--panel);border-bottom:1px solid var(--line)}
+.ovl .ib{flex:1;overflow:auto;padding:18px 14px calc(30px + env(safe-area-inset-bottom,0px))}
+.ovl .iw{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px;line-height:1.55;font-size:15px}
+.ovl h2{font-size:22px;line-height:1.25}
+.ovl h3{font-size:16px;margin-bottom:2px}
+.ovl p{margin:0}
+.ovl .lead{font-size:16px;color:var(--muted)}
+.ovl .hero{display:flex;gap:12px;align-items:flex-start;background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:14px}
+.ovl .hero .ico svg{width:26px;height:26px;color:var(--accent)}
+.ovl .steps{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.ovl .st{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.ovl .st .n{width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font-weight:600;font-size:13px}
+.ovl .st p{font-size:14px;color:var(--muted)}
+.ovl .who{display:grid;gap:10px}
+.ovl .wc{background:var(--panel2);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;display:grid;gap:6px}
+.ovl .wc.ext{border-left-color:var(--warn)}
+.ovl .wc.dir{border-left-color:var(--ok)}
+.ovl .wc h3{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ovl .tg{font-size:11.5px;font-weight:500;border:1px solid var(--line);border-radius:999px;padding:0 8px;color:var(--muted)}
+.ovl .see,.ovl .nsee{font-size:14px;display:flex;gap:8px}
+.ovl .see::before{content:"👁";flex:none}
+.ovl .nsee::before{content:"🔒";flex:none}
+.ovl .note{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:6px}
+.ovl ul{margin:0;padding-left:20px;display:grid;gap:5px}
+.ovl .flow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:13px;text-align:center}
+.ovl .flow .nd{border:2px solid var(--ok);border-radius:10px;padding:8px 12px;font-weight:500}
+.ovl .flow .ar{color:var(--ok);font-weight:600}
+.ovl .flow .lbl{width:100%;color:var(--muted);font-size:12.5px}
 
 /* ---- mode de connexion : Réunion / Dépannage ---- */
 .modes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -306,13 +306,28 @@ body.support .tile.screen{aspect-ratio:auto;height:calc(100dvh - 190px);min-heig
 .tile .btn.sm.on{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
 .clipmsg{display:flex;flex-direction:column;gap:6px}
 .clipmsg pre{margin:0;font:12px/1.4 ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-word;max-height:110px;overflow:auto;background:var(--bg);border-radius:6px;padding:6px}
+.ovl .tg{font-size:11.5px}
+#guide .sec{display:flex;flex-direction:column;gap:10px;scroll-margin-top:12px}
+#guide .toc{display:flex;flex-wrap:wrap;gap:6px}
+#guide .toc a{border:1px solid var(--line);background:var(--panel2);border-radius:999px;padding:4px 12px;font-size:13px;color:var(--fg);text-decoration:none}
+#guide .toc a:hover{border-color:var(--accent);color:var(--accent)}
+#guide ol{margin:0;padding-left:22px;display:grid;gap:8px}
+#guide li b{font-weight:600}
+#guide table{background:var(--panel2);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:14px}
+#guide td:first-child{white-space:nowrap;font-weight:500;width:1%}
+#guide td .ico svg{width:17px;height:17px;vertical-align:-4px;margin-right:6px}
+#guide .tip{border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 10px 10px 0;padding:10px 12px;font-size:14px}
+#guide .warn2{background:var(--panel2);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:0 10px 10px 0;padding:10px 12px;font-size:14px}
+#guide .qa{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+#guide .qa summary{cursor:pointer;font-weight:600}
+#guide .qa p,#guide .qa ul{margin-top:8px;font-size:14px}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
 </head>
 <body>
 <div id="app">
   <div class="bar" id="topbar">
-    <div class="brand"><i class="ico" data-i="share"></i><span>Let Us Share</span><span class="tag">prototype v4.2</span></div>
+    <div class="brand"><i class="ico" data-i="share"></i><span>Let Us Share</span><span class="tag">prototype v4.3</span></div>
     <span class="pill" id="statusPill"><i class="dot" id="statusDot"></i><span id="statusTxt">Hors réunion</span></span>
     <div class="spacer"></div>
     <button class="btn" id="bSide" title="Afficher ou masquer le panneau Chat / Fichiers / Connexion" hidden><span class="ico" data-i="sidebar"></span><span class="hide-s">Panneau</span></button>
@@ -342,6 +357,7 @@ body.support .tile.screen{aspect-ratio:auto;height:calc(100dvh - 190px);min-heig
           <div class="or">ou rejoindre une réunion</div>
           <div class="row"><input class="inp" id="joinIn" style="flex:1" placeholder="Coller le lien ou le secret de la réunion" autocomplete="off"><button class="btn" id="bJoin">Rejoindre</button></div>
           <div class="secure"><span class="ico" data-i="lock"></span><span>Chiffré de bout en bout. Seules les personnes qui ont le secret de la réunion peuvent y entrer.</span></div>
+          <div class="row"><button class="lnk" id="bOpenGuide">📘 Première fois ? Comment créer ou rejoindre une réunion</button></div>
           <div class="row"><button class="lnk" id="bOpenInfo">🔒 Que voient les serveurs ? Comment c’est protégé ?</button></div>
           <div class="row"><button class="lnk" id="bOpenSettings">Paramètres et tests réseau…</button></div>
         </div>
@@ -402,7 +418,7 @@ body.support .tile.screen{aspect-ratio:auto;height:calc(100dvh - 190px);min-heig
           <div class="code" id="invCode"></div>
           <div class="row"><button class="btn sm" id="bCopyLink"><span class="ico" data-i="copy"></span>Copier le lien</button><button class="btn sm" id="bCopySecret"><span class="ico" data-i="copy"></span>Copier le secret</button></div>
         </div>
-        <div class="box"><button class="lnk" id="bOpenInfo2" style="text-align:left">🔒 Que voient les serveurs ? Comment c’est protégé ?</button></div>
+        <div class="box"><button class="lnk" id="bOpenGuide2" style="text-align:left">📘 Guide d’utilisation</button><button class="lnk" id="bOpenInfo2" style="text-align:left">🔒 Que voient les serveurs ? Comment c’est protégé ?</button></div>
         <div class="box"><div class="sh"><span>Ma connexion</span></div><div id="connInfo"></div></div>
         <div class="box"><div class="sh"><span>Participants</span></div><div id="connPeers"></div></div>
         <details class="box"><summary>Journal technique</summary><div id="log"></div></details>
@@ -447,7 +463,88 @@ body.support .tile.screen{aspect-ratio:auto;height:calc(100dvh - 190px);min-heig
   </div>
 </div>
 <div id="notice" hidden role="status" aria-live="polite"></div>
-<section id="info" hidden aria-label="Confidentialité et sécurité">
+<section id="guide" class="ovl" hidden aria-label="Guide d’utilisation">
+  <div class="ih"><strong>Guide d’utilisation</strong><button class="btn icon" id="bGuideX" title="Fermer (Échap)" aria-label="Fermer"><span class="ico" data-i="x"></span></button></div>
+  <div class="ib"><div class="iw">
+    <h2>Créer une réunion et s’y connecter, pas à pas</h2>
+    <div class="hero"><span class="ico" data-i="share"></span><p><b>Let Us Share</b> permet de se voir, se parler, s’écrire, s’envoyer des fichiers et partager son écran. <b>Rien à installer, aucun compte à créer</b> : il suffit d’un navigateur récent (Chrome, Edge, Firefox ou Safari, sur ordinateur, iPhone ou Android) et d’un lien.</p></div>
+    <div class="toc"><a href="#g1">1. Créer</a><a href="#g2">2. Inviter</a><a href="#g3">3. Rejoindre</a><a href="#g4">4. Pendant la réunion</a><a href="#g5">5. Dépannage</a><a href="#g6">6. Ça ne marche pas ?</a></div>
+
+    <div class="sec" id="g1"><h3>1. Créer une réunion <span class="tg">vous êtes l’organisateur</span></h3>
+      <ol>
+        <li>Ouvrez la page de Let Us Share.</li>
+        <li>Saisissez <b>votre nom</b> (celui que les autres verront). Vous pouvez le laisser vide : un nom provisoire sera choisi.</li>
+        <li>Choisissez le mode : <b>Réunion</b> (image, son, chat, fichiers, écran) ou <b>Dépannage</b> (écran, fichiers et chat, sans audio ni vidéo).</li>
+        <li>En mode Réunion, laissez cochées <b>Caméra</b> et <b>Micro</b> si vous voulez être vu et entendu.</li>
+        <li>Cliquez sur <b>Créer une réunion</b>. Le navigateur demande l’autorisation d’utiliser la caméra et le micro : cliquez sur <b>Autoriser</b>.</li>
+      </ol>
+      <div class="tip">C’est fait : votre réunion existe. En haut, l’état indique « en attente de participants ». Personne ne peut y entrer tant que vous n’avez pas envoyé le lien.</div></div>
+
+    <div class="sec" id="g2"><h3>2. Inviter les autres</h3>
+      <ol>
+        <li>Ouvrez l’onglet <b>Connexion</b> (sur téléphone : bouton <span class="ico" data-i="chat"></span> en bas, puis onglet Connexion).</li>
+        <li>Cliquez sur <b>Copier le lien</b>.</li>
+        <li>Envoyez ce lien par e‑mail, SMS ou messagerie à chaque participant (jusqu’à 6 personnes en tout).</li>
+      </ol>
+      <div class="warn2"><b>Le lien est la clé de la réunion.</b> Quiconque l’a peut entrer. Ne le publiez pas, et envoyez-le seulement aux personnes concernées. Vous pouvez ensuite <b>verrouiller</b> la réunion (onglet Personnes) pour admettre vous-même chaque arrivant.</div></div>
+
+    <div class="sec" id="g3"><h3>3. Rejoindre une réunion</h3>
+      <ol>
+        <li><b>Cliquez sur le lien</b> que l’on vous a envoyé. La page s’ouvre avec le lien déjà rempli. (Sinon, collez le lien, ou seulement le « secret », dans la zone « ou rejoindre une réunion ».)</li>
+        <li>Saisissez votre nom.</li>
+        <li>Cliquez sur <b>Rejoindre</b> et autorisez la caméra et le micro si le navigateur le demande.</li>
+        <li>Patientez quelques secondes : les vignettes des autres participants apparaissent. En haut, l’état indique « liaison directe » ou « via relais ».</li>
+      </ol>
+      <div class="tip">Si l’organisateur a verrouillé la réunion, attendez qu’il vous admette. Un message vous le rappelle si personne n’apparaît.</div></div>
+
+    <div class="sec" id="g4"><h3>4. Pendant la réunion</h3>
+      <p>La barre du bas regroupe les commandes :</p>
+      <table>
+        <tr><td><span class="ico" data-i="mic"></span>Micro</td><td>Couper ou rétablir votre son.</td></tr>
+        <tr><td><span class="ico" data-i="video"></span>Caméra</td><td>Couper ou rétablir votre image.</td></tr>
+        <tr><td><span class="ico" data-i="screen"></span>Écran</td><td>Partager votre écran ou une fenêtre (ordinateur uniquement). Cliquez de nouveau pour arrêter. « Changer de fenêtre » permet d’en choisir une autre.</td></tr>
+        <tr><td><span class="ico" data-i="paperclip"></span>Fichiers</td><td>Ouvre l’onglet Fichiers : choisissez ou glissez un fichier. Les autres le téléchargent directement depuis votre appareil, tant que vous restez dans la réunion (jusqu’à 1 Go environ).</td></tr>
+        <tr><td><span class="ico" data-i="chat"></span>Chat</td><td>Messages, emoticônes 😊 et envoi de votre presse-papiers 📋. Un petit badge indique les nouveautés.</td></tr>
+        <tr><td><span class="ico" data-i="leave"></span>Quitter</td><td>Raccroche et ferme la réunion pour vous.</td></tr>
+      </table>
+      <p><b>L’organisateur</b> dispose en plus de l’onglet <b>Personnes</b> : couper le micro ou la caméra d’un participant, régler ses droits (chat, fichiers, écran, contrôle), l’exclure, ou verrouiller la réunion.</p>
+      <p><b>Un participant partage son écran ?</b> Vous pouvez montrer un endroit avec le <b>Pointeur</b>, <b>Dessiner</b> dessus, ou <b>Demander le contrôle</b> : la personne doit alors accepter, et peut arrêter à tout moment.</p></div>
+
+    <div class="sec" id="g5"><h3>5. Faire du dépannage à distance</h3>
+      <p>Choisissez le mode <b>Dépannage</b> à la création : pas d’audio ni de vidéo, seulement l’écran, les fichiers et le chat. Pour parler, utilisez le téléphone ou le chat.</p>
+      <ol>
+        <li><b>L’aidant</b> crée la réunion en mode Dépannage et envoie le lien.</li>
+        <li><b>La personne dépannée</b> clique sur le lien, saisit son nom, rejoint, puis clique sur <b>Partager mon écran</b> et choisit l’écran ou la fenêtre à montrer.</li>
+        <li>L’aidant <b>voit l’écran</b>, le désigne avec le pointeur ou le dessin, écrit dans le chat, envoie des fichiers ou du texte copié.</li>
+        <li>Si besoin, l’aidant clique sur <b>Demander le contrôle</b> ; la personne dépannée accepte (ou refuse).</li>
+      </ol>
+      <div class="tip">La personne dépannée garde la main : elle choisit ce qu’elle montre, voit en permanence qui agit, et peut tout arrêter d’un clic.</div></div>
+
+    <div class="sec" id="g6"><h3>6. Ça ne marche pas ? Les cas les plus fréquents</h3>
+      <details class="qa"><summary>Personne n’apparaît après une minute</summary><ul>
+        <li>Vérifiez que tout le monde utilise <b>exactement le même lien</b> (ou le même secret).</li>
+        <li>Si la réunion est verrouillée, l’organisateur doit vous admettre.</li>
+        <li>Ouvrez « Paramètres et tests » puis « Tester » : les relais de signalisation doivent apparaître en vert.</li></ul></details>
+      <details class="qa"><summary>On se trouve, puis la connexion échoue</summary><ul>
+        <li>C’est souvent un réseau d’entreprise ou un Wi‑Fi public qui bloque les connexions directes.</li>
+        <li>Renseignez le <b>relais TURN</b> (Paramètres et tests : adresses et secret fournis par votre administrateur), puis testez-le. Il fait passer la réunion par le port 443, comme un site sécurisé.</li>
+        <li>Faites-le sur <b>tous</b> les appareils concernés, puis relancez la réunion.</li></ul></details>
+      <details class="qa"><summary>On ne voit pas ma caméra ou on ne m’entend pas</summary><ul>
+        <li>Cliquez sur le cadenas à gauche de l’adresse du site, autorisez la caméra et le micro, puis rechargez la page.</li>
+        <li>Fermez les autres applications qui utilisent la caméra (autre visioconférence).</li>
+        <li>Contrôlez que le micro n’est pas coupé dans la barre du bas, ni par l’organisateur.</li></ul></details>
+      <details class="qa"><summary>Sur iPhone ou Android</summary><ul>
+        <li>La page doit être ouverte en <b>https://</b> (adresse sécurisée) : sinon la caméra est refusée.</li>
+        <li>Sur iPhone, utilisez <b>Safari</b>. Le partage d’écran n’est pas proposé par les navigateurs des téléphones : un téléphone peut en revanche voir l’écran partagé par un ordinateur.</li></ul></details>
+      <details class="qa"><summary>J’ai perdu le lien</summary><ul>
+        <li>Dans la réunion, onglet <b>Connexion</b> puis « Copier le lien ». Sinon, l’organisateur en crée une nouvelle.</li></ul></details>
+      <details class="qa"><summary>Comment être sûr de parler à la bonne personne ?</summary><ul>
+        <li>Comparez à voix haute le <b>code de vérification</b> à 6 chiffres (onglet Connexion). S’il est identique des deux côtés, personne ne s’est glissé entre vous. Pour en savoir plus : « Que voient les serveurs ? ».</li></ul></details>
+    </div>
+    <button class="btn primary big" id="bGuideOk">J’ai compris, c’est parti</button>
+  </div></div>
+</section>
+<section id="info" class="ovl" hidden aria-label="Confidentialité et sécurité">
   <div class="ih"><strong>Confidentialité et sécurité</strong><button class="btn icon" id="bInfoX" title="Fermer (Échap)" aria-label="Fermer"><span class="ico" data-i="x"></span></button></div>
   <div class="ib"><div class="iw">
     <h2>Rien de votre discussion ne passe par un serveur externe</h2>
@@ -1766,10 +1863,14 @@ $$('.stab').forEach(b => { b.onclick = () => selectTab(b.dataset.tab); });
 $('#bSend').onclick = sendChat;
 $('#bClip').onclick = sendClip;
 $('#bEmoji').onclick = () => { const p = $('#emojiPop'); p.hidden = !p.hidden; };
-const openInfo = on => { $('#info').hidden = !on; if (on) $('#info .ib').scrollTop = 0; };
+const openOv = (id, on) => { const o = $(id); o.hidden = !on; if (on) o.querySelector('.ib').scrollTop = 0; };
+const openInfo = on => openOv('#info', on), openGuide = on => openOv('#guide', on);
+$('#bOpenGuide').onclick = () => openGuide(true); $('#bOpenGuide2').onclick = () => openGuide(true);
+$('#bGuideX').onclick = () => openGuide(false); $('#bGuideOk').onclick = () => openGuide(false);
+$$('#guide .toc a').forEach(a => a.addEventListener('click', e => { e.preventDefault(); const t = $(a.getAttribute('href')); if (t && t.scrollIntoView) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
 $('#bOpenInfo').onclick = () => openInfo(true); $('#bOpenInfo2').onclick = () => openInfo(true);
 $('#bInfoX').onclick = () => openInfo(false); $('#bInfoOk').onclick = () => openInfo(false);
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#info').hidden) openInfo(false); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (!$('#info').hidden) openInfo(false); else if (!$('#guide').hidden) openGuide(false); } });
 $('#chatIn').onkeydown = e => { if (e.key === 'Enter') sendChat(); };
 $('#bCopyLink').onclick = () => { navigator.clipboard.writeText($('#invCode').textContent); toast('Lien copié'); };
 $('#bCopySecret').onclick = () => { navigator.clipboard.writeText($('#invCode').textContent.split('#').pop()); toast('Secret copié'); };

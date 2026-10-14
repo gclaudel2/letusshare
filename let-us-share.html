@@ -1,0 +1,1429 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Let Us Share</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#e9ecf1; --panel:#f6f7f9; --panel2:#ffffff; --line:#d3d8e0; --fg:#1a2230; --muted:#5b6678;
+  --accent:#0b7a75; --accent-fg:#ffffff; --accent-soft:rgba(11,122,117,.13);
+  --edit:#d4680b; --danger:#c23b3b; --ok:#1d8a4e; --warn:#b86a00;
+  --shadow:0 1px 3px rgba(20,30,50,.18),0 6px 22px rgba(20,30,50,.12);
+  --font:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12161d; --panel:#1a202a; --panel2:#222a37; --line:#303a4a; --fg:#e5e9f1; --muted:#93a0b5;
+  --accent:#3cc1b6; --accent-fg:#07201e; --accent-soft:rgba(60,193,182,.16);
+  --edit:#f0953c; --danger:#ee6b6b; --ok:#4cc88a; --warn:#f0953c; --shadow:0 1px 3px rgba(0,0,0,.5),0 6px 22px rgba(0,0,0,.4); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161d; --panel:#1a202a; --panel2:#222a37; --line:#303a4a; --fg:#e5e9f1; --muted:#93a0b5;
+  --accent:#3cc1b6; --accent-fg:#07201e; --accent-soft:rgba(60,193,182,.16);
+  --edit:#f0953c; --danger:#ee6b6b; --ok:#4cc88a; --warn:#f0953c; --shadow:0 1px 3px rgba(0,0,0,.5),0 6px 22px rgba(0,0,0,.4); color-scheme:dark}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.4 var(--font);overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{margin:0}
+#app{display:flex;flex-direction:column;height:100%;min-width:0}
+
+/* ---- barre du haut (même structure que Let Us PDF) ---- */
+.bar{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--panel);border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:thin;flex:none}
+.bar>*{flex:none}
+.spacer{flex:1 1 auto!important;min-width:8px}
+.sep{width:1px;align-self:stretch;background:var(--line);margin:3px 4px}
+.brand{font-weight:600;letter-spacing:.01em;display:flex;align-items:center;gap:8px;margin-right:6px}
+.brand i{width:20px;height:20px;border-radius:4px;background:var(--accent);display:grid;place-items:center;color:var(--accent-fg)}
+.brand i svg{width:14px;height:14px}
+.brand .tag{font-size:10.5px;font-weight:500;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 7px}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border:1px solid transparent;border-radius:6px;background:transparent;cursor:pointer;white-space:nowrap}
+.btn:hover:not(:disabled){background:var(--accent-soft)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn:focus-visible,.inp:focus-visible,.stab:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.btn.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-fg);font-weight:500}
+.btn.primary:hover:not(:disabled){background:var(--accent);filter:brightness(1.1)}
+.btn.danger{background:var(--danger);color:#fff;font-weight:500}
+.btn.danger:hover:not(:disabled){background:var(--danger);filter:brightness(1.1)}
+.btn.off{color:var(--danger);border-color:var(--danger)}
+.btn.icon{padding:0;width:32px;justify-content:center}
+.btn.big{height:40px;padding:0 16px;font-size:15px;justify-content:center}
+.btn.sm{height:26px;padding:0 8px;font-size:12.5px}
+.btn svg,.ico svg{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ico{display:inline-grid;place-items:center}
+.inp{height:32px;border:1px solid var(--line);border-radius:6px;background:var(--panel2);padding:0 8px;min-width:0}
+textarea.inp{height:auto;min-height:62px;padding:6px 8px;font:12px/1.4 ui-monospace,Consolas,monospace;width:100%;resize:vertical}
+.lbl{color:var(--muted);font-size:12px}
+.hint{color:var(--muted);font-size:12px;line-height:1.4}
+.lnk{border:0;background:none;color:var(--accent);cursor:pointer;padding:2px 0;font-weight:500}
+.pill{display:inline-flex;align-items:center;gap:7px;height:26px;padding:0 10px;border:1px solid var(--line);border-radius:999px;background:var(--panel2);font-size:12.5px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none;display:inline-block}
+.dot.ok{background:var(--ok)}.dot.warn{background:var(--warn)}.dot.ko{background:var(--danger)}
+.themesel{display:flex;align-items:center;gap:6px;padding-left:8px;color:var(--muted)}
+.themesel select{height:30px}
+.ok{color:var(--ok)}.ko{color:var(--danger)}.warn{color:var(--warn)}.mut{color:var(--muted)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+label.chk{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+
+/* ---- zone principale ---- */
+#main{flex:1;display:flex;min-height:0;position:relative}
+#stage{flex:1;min-width:0;position:relative;display:flex;flex-direction:column;overflow:auto}
+#home{margin:auto;width:100%;max-width:540px;padding:24px 16px}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:24px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px}
+.card h1{font-size:21px;font-weight:600}
+.card .sub{margin:0;color:var(--muted)}
+.or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.secure{display:flex;gap:8px;align-items:flex-start;color:var(--muted);font-size:12.5px}
+#meet{flex:1;display:flex;position:relative;min-height:0}
+#tiles{flex:1;overflow:auto;padding:14px 14px 84px;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));align-content:center}
+.tile{position:relative;background:#0e131a;border-radius:12px;overflow:hidden;aspect-ratio:16/9;box-shadow:var(--shadow)}
+.tile .ph{position:absolute;inset:0;display:grid;place-items:center;font-size:44px;font-weight:600;color:rgba(255,255,255,.45)}
+.tile video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tile .nm{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.62);color:#fff;padding:2px 9px;border-radius:6px;font-size:12px;display:flex;gap:7px;align-items:center}
+#ctrl{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:15;display:flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px 8px;max-width:calc(100% - 24px)}
+.tile.screen{grid-column:1/-1;background:#000}
+.tile.screen video{object-fit:contain}
+.tile.ctl{outline:3px solid var(--edit);outline-offset:-3px}
+.tile .tb{position:absolute;right:8px;bottom:8px;display:flex;gap:6px}
+#ctlbar{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:22;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;background:var(--panel2);border:1px solid var(--edit);border-radius:10px;box-shadow:var(--shadow);padding:8px 12px;max-width:calc(100% - 24px)}
+#rptr{position:fixed;z-index:70;pointer-events:none;left:0;top:0;transform:translate(-3px,-3px);transition:left .03s linear,top .03s linear}
+#rptr i{display:block;width:16px;height:16px;border-radius:50%;background:var(--edit);border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.4)}
+#rptr i.click{animation:pk .35s}
+#rptr b{position:absolute;left:18px;top:14px;background:var(--edit);color:#fff;font-size:11px;font-weight:500;padding:1px 6px;border-radius:5px;white-space:nowrap}
+@keyframes pk{0%{transform:scale(2.2)}100%{transform:scale(1)}}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:0 9px;height:23px;font-size:11.5px;cursor:pointer;background:var(--panel2);color:var(--muted)}
+.chip:hover{border-color:var(--accent)}
+.chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:500}
+.person{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:9px}
+.person:first-child{border-top:0;padding-top:0}
+.person .pt{display:flex;align-items:center;gap:7px;font-weight:500;flex-wrap:wrap}
+.person .pt .ico svg{width:15px;height:15px}
+.badge2.host{color:var(--edit);border-color:var(--edit)}
+#dropov{position:absolute;inset:0;z-index:30;display:grid;place-items:center;background:color-mix(in srgb,var(--bg) 82%,transparent);border:3px dashed var(--accent);font-size:18px;font-weight:600;color:var(--accent);pointer-events:none}
+
+/* ---- panneau latéral : Chat / Fichiers / Connexion ---- */
+#side{width:360px;flex:none;background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.stabs{display:flex;gap:2px;padding:6px 8px 0;border-bottom:1px solid var(--line);flex:none}
+.stab{position:relative;flex:1;height:34px;border:1px solid transparent;border-bottom:0;border-radius:7px 7px 0 0;background:transparent;color:var(--muted);cursor:pointer;font-weight:500}
+.stab:hover{background:var(--accent-soft)}
+.stab.on{background:var(--panel2);color:var(--fg);border-color:var(--line);box-shadow:inset 0 2px 0 var(--accent);margin-bottom:-1px;height:35px}
+.bd{display:inline-block;min-width:18px;height:18px;line-height:18px;border-radius:9px;background:var(--accent);color:var(--accent-fg);font-size:11px;font-style:normal;text-align:center;margin-left:6px;padding:0 5px}
+.pane{flex:1;min-height:0;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:12px}
+.pane.chatpane{overflow:hidden}
+#chatList{flex:1;overflow:auto;display:flex;flex-direction:column;gap:6px;min-height:0}
+.msg{max-width:92%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:6px 10px;overflow-wrap:anywhere}
+.msg.me{align-self:flex-end;background:var(--accent-soft);border-color:transparent}
+.msg .who{font-size:11.5px;color:var(--muted);font-weight:500}
+.msg.sys{align-self:center;background:transparent;border:0;color:var(--muted);font-size:12px;text-align:center}
+.sh{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.box{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.dz{display:flex;align-items:center;gap:10px;border:2px dashed var(--line);border-radius:10px;padding:12px;background:var(--panel2)}
+.dz.over{border-color:var(--accent);background:var(--accent-soft)}
+.dz b{display:block}
+.frow{display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.frow.off{opacity:.55}
+.frow .fi{flex:1;min-width:0}
+.frow .fn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.frow .fm{font-size:12px;color:var(--muted)}
+.bar2{height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:5px}
+.bar2>i{display:block;height:100%;background:var(--accent);width:0}
+.code{font:12px/1.4 ui-monospace,Consolas,monospace;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px;word-break:break-all;user-select:all}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:12.5px}
+.kv span:nth-child(odd){color:var(--muted)}
+.peer{display:flex;flex-direction:column;gap:3px;border-top:1px solid var(--line);padding-top:8px}
+.peer:first-child{border-top:0;padding-top:0}
+.peer .pt{display:flex;align-items:center;gap:8px;font-weight:500}
+.badge2{font-size:11.5px;border:1px solid var(--line);border-radius:999px;padding:0 8px;color:var(--muted)}
+.badge2.ok{color:var(--ok);border-color:var(--ok)}.badge2.warn{color:var(--warn);border-color:var(--warn)}
+details.box summary{cursor:pointer;font-weight:500}
+#log{height:170px;overflow:auto;font:11.5px/1.4 ui-monospace,Consolas,monospace;background:var(--bg);border-radius:6px;padding:6px;margin-top:8px}
+
+/* ---- tiroir Paramètres et tests ---- */
+#settings{position:absolute;top:0;right:0;bottom:0;width:min(450px,100%);z-index:25;background:var(--panel);border-left:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column}
+#settings .hd2{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line)}
+#settings .sbody{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:14px}
+#settings h3{font-size:13px;font-weight:600;margin-bottom:4px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+
+#toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 14px;border-radius:8px;z-index:60;max-width:min(92vw,520px);box-shadow:var(--shadow);font-size:13px}
+@media (max-width:760px){
+  #side{position:absolute;left:0;right:0;bottom:0;width:auto;height:62%;z-index:20;border-left:0;border-top:1px solid var(--line);box-shadow:var(--shadow)}
+  .hide-s{display:none}
+  #tiles{padding-bottom:64px}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="bar" id="topbar">
+    <div class="brand"><i class="ico" data-i="share"></i><span>Let Us Share</span><span class="tag">prototype v3.7</span></div>
+    <span class="pill" id="statusPill"><i class="dot" id="statusDot"></i><span id="statusTxt">Hors réunion</span></span>
+    <div class="spacer"></div>
+    <button class="btn" id="bSide" title="Afficher ou masquer le panneau Chat / Fichiers / Connexion" hidden><span class="ico" data-i="sidebar"></span><span class="hide-s">Panneau</span></button>
+    <button class="btn" id="bSettings" title="Paramètres et tests réseau (relais, serveurs)"><span class="ico" data-i="gear"></span><span class="hide-s">Paramètres et tests</span></button>
+    <label class="themesel" title="Apparence de l'interface"><span class="ico" data-i="theme"></span>
+      <select class="inp" id="themeSel" aria-label="Apparence"><option value="auto">Automatique</option><option value="light">Clair</option><option value="dark">Sombre</option></select></label>
+  </div>
+
+  <div id="main">
+    <div id="stage">
+      <!-- ===== Accueil ===== -->
+      <section id="home">
+        <div class="card">
+          <h1>Réunions chiffrées, de poste à poste</h1>
+          <p class="sub">Visio, chat et partage de fichiers. Aucun serveur central : les flux passent directement entre les participants.</p>
+          <label class="lbl" for="name">Votre nom</label>
+          <input class="inp" id="name" placeholder="Comment les autres vous voient" autocomplete="off" maxlength="40">
+          <div class="row">
+            <label class="chk"><input type="checkbox" id="useCam" checked> Caméra</label>
+            <label class="chk"><input type="checkbox" id="useMic" checked> Micro</label>
+          </div>
+          <button class="btn primary big" id="bCreate"><span class="ico" data-i="video"></span>Créer une réunion</button>
+          <div class="or">ou rejoindre une réunion</div>
+          <div class="row"><input class="inp" id="joinIn" style="flex:1" placeholder="Coller le lien ou le secret de la réunion" autocomplete="off"><button class="btn" id="bJoin">Rejoindre</button></div>
+          <div class="secure"><span class="ico" data-i="lock"></span><span>Chiffré de bout en bout. Seules les personnes qui ont le secret de la réunion peuvent y entrer.</span></div>
+          <div class="row"><button class="lnk" id="bOpenSettings">Paramètres et tests réseau…</button></div>
+        </div>
+      </section>
+
+      <!-- ===== Réunion ===== -->
+      <section id="meet" hidden>
+        <div id="ctlbar" hidden><span id="ctlTxt"></span><button class="btn sm primary" id="ctlOk">Autoriser</button><button class="btn sm" id="ctlNo">Refuser</button><button class="btn sm danger" id="ctlStop">Arrêter le contrôle</button></div>
+        <div id="tiles"></div>
+        <div id="ctrl">
+          <button class="btn" id="cMic"><span class="ico" data-i="mic"></span><span class="hide-s">Micro</span></button>
+          <button class="btn" id="cCam"><span class="ico" data-i="video"></span><span class="hide-s">Caméra</span></button>
+          <button class="btn" id="cScreen" title="Partager votre écran"><span class="ico" data-i="screen"></span><span class="hide-s">Écran</span></button>
+          <button class="btn" id="cFiles"><span class="ico" data-i="paperclip"></span><span class="hide-s">Fichiers</span></button>
+          <div class="sep"></div>
+          <button class="btn danger" id="cLeave"><span class="ico" data-i="leave"></span><span class="hide-s">Quitter</span></button>
+        </div>
+      </section>
+      <div id="dropov" hidden>Déposez vos fichiers pour les partager</div>
+    </div>
+
+    <aside id="side" hidden aria-label="Chat, fichiers et connexion">
+      <div class="stabs" role="tablist">
+        <button class="stab on" role="tab" data-tab="chat">Chat<i class="bd" id="bdChat" hidden></i></button>
+        <button class="stab" role="tab" data-tab="files">Fichiers<i class="bd" id="bdFiles" hidden></i></button>
+        <button class="stab" role="tab" data-tab="people">Personnes<i class="bd" id="bdPeople" hidden></i></button>
+        <button class="stab" role="tab" data-tab="conn">Connexion</button>
+      </div>
+
+      <div class="pane chatpane" id="pane-chat">
+        <div id="chatList"></div>
+        <div class="row" style="flex-wrap:nowrap"><input class="inp" id="chatIn" style="flex:1" placeholder="Écrire un message…" autocomplete="off"><button class="btn primary icon" id="bSend" title="Envoyer"><span class="ico" data-i="send"></span></button></div>
+      </div>
+
+      <div class="pane" id="pane-files" hidden>
+        <div class="dz" id="dz"><span class="ico" data-i="upload"></span><div style="flex:1"><b>Partager des fichiers</b><span class="hint">Glissez-les n'importe où dans la fenêtre, ou choisissez-les.</span></div><button class="btn primary" id="bAddFiles">Choisir…</button></div>
+        <div class="hint">Un fichier partagé reste sur votre ordinateur : les autres participants le téléchargent directement depuis vous, tant que vous êtes dans la réunion. Fichiers jusqu'à environ 1 Go.</div>
+        <div class="sh"><span>Fichiers partagés <span id="fCount"></span></span></div>
+        <div id="fList"></div>
+        <div class="sh"><span>Transferts</span><button class="lnk" id="bClearT">Effacer les terminés</button></div>
+        <div id="tList"></div>
+        <input type="file" id="fPick" multiple hidden>
+      </div>
+
+      <div class="pane" id="pane-people" hidden><div id="peopleList"></div></div>
+
+      <div class="pane" id="pane-conn" hidden>
+        <div class="box">
+          <div class="sh"><span>Inviter</span></div>
+          <div class="hint" id="invHint"></div>
+          <div class="code" id="invCode"></div>
+          <div class="row"><button class="btn sm" id="bCopyLink"><span class="ico" data-i="copy"></span>Copier le lien</button><button class="btn sm" id="bCopySecret"><span class="ico" data-i="copy"></span>Copier le secret</button></div>
+        </div>
+        <div class="box"><div class="sh"><span>Ma connexion</span></div><div id="connInfo"></div></div>
+        <div class="box"><div class="sh"><span>Participants</span></div><div id="connPeers"></div></div>
+        <details class="box"><summary>Journal technique</summary><div id="log"></div></details>
+      </div>
+    </aside>
+
+    <!-- ===== Paramètres et tests (zone à part, masquable) ===== -->
+    <aside id="settings" hidden aria-label="Paramètres et tests">
+      <div class="hd2"><strong>Paramètres et tests</strong><button class="btn icon" id="bSetClose" title="Fermer (Échap)"><span class="ico" data-i="x"></span></button></div>
+      <div class="sbody">
+        <div>
+          <h3>Signalisation (relais Nostr)</h3>
+          <div class="hint" style="margin-bottom:6px">Servent uniquement à mettre les participants en relation. Ils ne voient que des messages chiffrés. Un par ligne.</div>
+          <textarea class="inp" id="setRelays" spellcheck="false"></textarea>
+        </div>
+        <div>
+          <h3>Découverte réseau (STUN)</h3>
+          <div class="hint" style="margin-bottom:6px">Permet de découvrir l'adresse publique. Un par ligne.</div>
+          <textarea class="inp" id="setStun" spellcheck="false"></textarea>
+        </div>
+        <div>
+          <h3>Relais TURN (secours)</h3>
+          <div class="hint" style="margin-bottom:6px">Utilisé quand la liaison directe est impossible (pare-feu qui bloque l'UDP). Le relais ne peut pas lire les communications.</div>
+          <textarea class="inp" id="setTurn" spellcheck="false"></textarea>
+          <div class="row" style="margin-top:6px"><select class="inp" id="setTurnMode" style="flex:1">
+            <option value="secret">Secret du relais (identifiants temporaires)</option>
+            <option value="static">Identifiant + mot de passe fixes</option></select></div>
+          <div class="row" style="margin-top:6px"><input class="inp" id="setTurnA" style="flex:1" placeholder="Secret du relais (ou identifiant en mode fixe)" autocomplete="off"><input class="inp" id="setTurnB" style="flex:1" placeholder="Mot de passe (mode fixe)" autocomplete="off"></div>
+          <div style="margin-top:6px;display:grid;gap:4px">
+            <label class="chk"><input type="checkbox" id="setForce"> Forcer le passage par le relais (test)</label>
+            <label class="chk"><input type="checkbox" id="setRemember"> Mémoriser le secret sur cet ordinateur</label>
+          </div>
+        </div>
+        <div>
+          <h3>Tests</h3>
+          <div class="row"><button class="btn primary" id="bTest">Tester relais, STUN et TURN</button><button class="btn" id="bDefaults">Valeurs par défaut</button></div>
+          <div id="testout" style="margin-top:8px"></div>
+        </div>
+        <div class="hint">Les paramètres s'appliquent à la prochaine réunion. Les réglages (sauf le secret, si vous ne cochez pas la case) sont mémorisés sur cet ordinateur.</div>
+      </div>
+    </aside>
+  </div>
+</div>
+<div id="rptr" hidden><i></i><b></b></div>
+<div id="toast" hidden></div>
+
+<script type="module">
+/* ============ Signature Schnorr (Nostr) : chargée en arrière-plan ============ */
+let schnorr = null;
+const schnorrReady = (async () => {
+  for (const u of ['https://cdn.jsdelivr.net/npm/@noble/curves@1.4.0/secp256k1/+esm', 'https://esm.sh/@noble/curves@1.4.0/secp256k1']) {
+    try { ({ schnorr } = await import(u)); return true; } catch (e) { /* source suivante */ }
+  }
+  return false;
+})();
+
+/* ============ Utilitaires ============ */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const enc = new TextEncoder(), dec = new TextDecoder();
+const KIND = 20078;                       // plage "éphémère" Nostr (20000-29999)
+const hex = b => [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
+const unhex = s => Uint8Array.from(s.match(/../g).map(h => parseInt(h, 16)));
+const b64 = u8 => btoa(String.fromCharCode(...u8));
+const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const b64u = u8 => b64(u8).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const ub64u = s => ub64(s.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - s.length % 4) % 4));
+const sha256 = d => crypto.subtle.digest('SHA-256', d);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const lines = id => $(id).value.split('\n').map(s => s.trim()).filter(Boolean);
+const uid = () => hex(crypto.getRandomValues(new Uint8Array(8)));
+const fmtSize = n => n < 1024 ? n + ' o' : n < 1048576 ? Math.round(n / 1024) + ' Ko' : n < 1073741824 ? (n / 1048576).toFixed(1) + ' Mo' : (n / 1073741824).toFixed(2) + ' Go';
+const gathered = (pc, ms = 6000) => new Promise(r => {
+  if (pc.iceGatheringState === 'complete') return r();
+  const t = setTimeout(r, ms);
+  pc.addEventListener('icegatheringstatechange', () => { if (pc.iceGatheringState === 'complete') { clearTimeout(t); r(); } });
+});
+const pending = new Set();
+function schedule(fn) { if (pending.has(fn)) return; pending.add(fn); setTimeout(() => { pending.delete(fn); fn(); }, 120); }
+let toastT = 0;
+function toast(msg, ms) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, ms || 3600); }
+function log(msg, cls = '') {
+  const d = document.createElement('div');
+  if (cls) d.className = cls;
+  d.textContent = new Date().toLocaleTimeString() + '  ' + msg;
+  const box = $('#log'); box.appendChild(d); box.scrollTop = box.scrollHeight;
+}
+
+/* ============ Icônes (même style que Let Us PDF) ============ */
+const ic = p => '<svg viewBox="0 0 24 24" aria-hidden="true">' + p + '</svg>';
+const ICONS = {
+  screen: ic('<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>'),
+  share: ic('<circle cx="7" cy="12" r="2.4"/><circle cx="17" cy="6.5" r="2.4"/><circle cx="17" cy="17.5" r="2.4"/><path d="m9.2 10.9 5.6-3.3M9.2 13.1l5.6 3.3"/>'),
+  video: ic('<rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3z"/>'),
+  videooff: ic('<path d="M16 16v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2"/><path d="m16 10 5-3v10l-2-1.2"/><path d="m3 3 18 18"/>'),
+  mic: ic('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>'),
+  micoff: ic('<path d="M9 9V6a3 3 0 0 1 5.5-1.7M15 10v1a3 3 0 0 1-5 2.2"/><path d="M5 11a7 7 0 0 0 11.5 5.3M19 11a7 7 0 0 1-.6 2.8M12 18v3"/><path d="m3 3 18 18"/>'),
+  leave: ic('<path d="M4 15c4-4 12-4 16 0l-2 3-3-1.5V14a10 10 0 0 0-6 0v2.5L6 18z"/>'),
+  gear: ic('<circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8"/>'),
+  sidebar: ic('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/>'),
+  theme: ic('<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>'),
+  x: ic('<path d="m6 6 12 12M18 6 6 18"/>'),
+  send: ic('<path d="m4 12 16-8-6 16-3-7z"/>'),
+  paperclip: ic('<path d="M20 11.5 12 19.5a5 5 0 0 1-7-7l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7L10 17.2a1.7 1.7 0 0 1-2.4-2.4L15 7.4"/>'),
+  upload: ic('<path d="M12 16V5"/><path d="m7 10 5-5 5 5"/><path d="M5 20h14"/>'),
+  download: ic('<path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/>'),
+  trash: ic('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>'),
+  copy: ic('<rect x="8" y="8" width="12" height="12" rx="1.5"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>'),
+  lock: ic('<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>'),
+  file: ic('<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/>')
+};
+$$('[data-i]').forEach(e => { e.innerHTML = ICONS[e.dataset.i] || ''; });
+
+/* ============ Réglages mémorisés et thème ============ */
+const ls = { get(k) { try { return localStorage.getItem('lus.' + k); } catch { return null; } }, set(k, v) { try { localStorage.setItem('lus.' + k, v); } catch { /* ignoré */ } }, del(k) { try { localStorage.removeItem('lus.' + k); } catch { /* ignoré */ } } };
+const DEF = {
+  relays: 'wss://nos.lol\nwss://relay.primal.net\nwss://offchain.pub',
+  stun: 'stun:stun.l.google.com:19302\nstun:stun.cloudflare.com:3478',
+  turn: 'turns:turn.solenga.fr:443?transport=tcp\nturn:turn.solenga.fr:3478?transport=udp\nturn:turn.solenga.fr:3478?transport=tcp'
+};
+function applyTheme(v) { if (v === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', v); }
+function loadSettings() {
+  $('#setRelays').value = ls.get('relays') ?? DEF.relays;
+  $('#setStun').value = ls.get('stun') ?? DEF.stun;
+  $('#setTurn').value = ls.get('turn') ?? DEF.turn;
+  $('#setTurnMode').value = ls.get('turnmode') || 'secret';
+  $('#setForce').checked = ls.get('force') === '1';
+  $('#setRemember').checked = ls.get('remember') === '1';
+  if ($('#setRemember').checked) { $('#setTurnA').value = ls.get('turnA') || ''; $('#setTurnB').value = ls.get('turnB') || ''; }
+  $('#name').value = ls.get('name') || '';
+  $('#useCam').checked = ls.get('cam') !== '0';
+  $('#useMic').checked = ls.get('mic') !== '0';
+  const th = ls.get('theme') || 'auto'; $('#themeSel').value = th; applyTheme(th);
+}
+function saveSettings() {
+  ls.set('relays', $('#setRelays').value); ls.set('stun', $('#setStun').value); ls.set('turn', $('#setTurn').value);
+  ls.set('turnmode', $('#setTurnMode').value); ls.set('force', $('#setForce').checked ? '1' : '0');
+  ls.set('remember', $('#setRemember').checked ? '1' : '0');
+  if ($('#setRemember').checked) { ls.set('turnA', $('#setTurnA').value); ls.set('turnB', $('#setTurnB').value); } else { ls.del('turnA'); ls.del('turnB'); }
+  ls.set('name', $('#name').value); ls.set('cam', $('#useCam').checked ? '1' : '0'); ls.set('mic', $('#useMic').checked ? '1' : '0');
+}
+
+/* ============ Cryptographie : HKDF + AES-GCM (WebCrypto) ============ */
+async function derive(secret) {
+  const base = await crypto.subtle.importKey('raw', secret, 'HKDF', false, ['deriveBits', 'deriveKey']);
+  const salt = enc.encode('p2p-visio/v0');
+  const roomBits = await crypto.subtle.deriveBits({ name: 'HKDF', hash: 'SHA-256', salt, info: enc.encode('room') }, base, 128);
+  const key = await crypto.subtle.deriveKey({ name: 'HKDF', hash: 'SHA-256', salt, info: enc.encode('enc') }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+  return { roomId: hex(roomBits), key };
+}
+async function seal(obj) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: enc.encode(S.roomId) }, S.key, enc.encode(JSON.stringify(obj))));
+  const out = new Uint8Array(12 + ct.length); out.set(iv); out.set(ct, 12);
+  return b64(out);
+}
+async function unseal(str) {
+  const raw = ub64(str);
+  const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: raw.slice(0, 12), additionalData: enc.encode(S.roomId) }, S.key, raw.slice(12));
+  return JSON.parse(dec.decode(pt));
+}
+async function makeEvent(content, tagVal, priv, pub) {
+  const created_at = Math.floor(Date.now() / 1000), tags = [['t', tagVal]];
+  const id = hex(await sha256(enc.encode(JSON.stringify([0, pub, created_at, KIND, tags, content]))));
+  const sig = hex(schnorr.sign(unhex(id), priv));
+  return { id, pubkey: pub, created_at, kind: KIND, tags, content, sig };
+}
+
+/* ============ État global ============ */
+const S = {
+  myId: null, name: '', roomId: null, key: null, secret: null, priv: null, pub: null,
+  relays: new Map(), seen: new Set(), peers: new Map(), local: null, stun: [], turn: [], force: false,
+  closed: false, inRoom: false, timers: [], tab: 'chat', unread: { chat: 0, files: 0 },
+  files: new Map(), transfers: new Map(), rid: (Math.random() * 1e9) | 0,
+  screen: null, screenTile: null, ctl: null, ctlReq: null,
+  // gestion de la réunion
+  isHost: false, hostfp: null, hostKey: null, hostPub: null, hostClaim: null, hostIds: new Set(), seqLast: 0,
+  hs: { locked: false, defaults: { chat: true, mic: true, cam: true, screen: true, files: true, ctl: true }, perms: {}, seq: 0 },
+  admitted: new Set(), pendingJoin: new Map(), banned: new Set(), _phtml: ''
+};
+
+/* ============ Relais de signalisation ============ */
+function connectRelay(url) {
+  const r = { url, state: 'connexion…', cls: 'warn', ws: null, tries: 0, rx: 0, ok: 0, rej: 0, rtt: null, msg: '' };
+  S.relays.set(url, r);
+  const open = () => {
+    if (S.closed) return;
+    let ws; const t0 = performance.now();
+    try { ws = new WebSocket(url); } catch (e) { r.state = 'URL invalide'; r.cls = 'ko'; schedule(renderConn); return; }
+    r.ws = ws;
+    ws.onopen = () => {
+      r.state = 'connecté'; r.cls = 'ok'; r.rtt = Math.round(performance.now() - t0); r.tries = 0;
+      ws.send(JSON.stringify(['REQ', 'p2p', { kinds: [KIND], '#t': [S.roomId], since: Math.floor(Date.now() / 1000) - 30 }]));
+      schedule(renderConn);
+    };
+    ws.onmessage = e => onRelayMsg(r, e.data);
+    ws.onerror = () => { r.state = 'erreur'; r.cls = 'ko'; schedule(renderConn); };
+    ws.onclose = () => {
+      if (S.closed) return;
+      r.state = 'déconnecté'; r.cls = 'warn'; schedule(renderConn);
+      setTimeout(open, Math.min(30000, 1000 * 2 ** r.tries++));
+    };
+  };
+  open();
+}
+function onRelayMsg(r, data) {
+  let m; try { m = JSON.parse(data); } catch { return; }
+  if (m[0] === 'EVENT') {
+    const ev = m[2];
+    if (!ev || S.seen.has(ev.id) || ev.pubkey === S.pub) return;
+    S.seen.add(ev.id); r.rx++;
+    handleEvent(ev);
+  } else if (m[0] === 'OK') {
+    if (m[2]) r.ok++; else { r.rej++; r.msg = m[3] || ''; }
+  } else if (m[0] === 'NOTICE' || m[0] === 'CLOSED') {
+    r.msg = String(m[m.length - 1] || '').slice(0, 80);
+  }
+  schedule(renderConn);
+}
+async function send(obj) {
+  const content = await seal({ ...obj, from: S.myId, name: S.name, ts: Date.now(), hp: S.hostClaim || undefined });
+  const ev = await makeEvent(content, S.roomId, S.priv, S.pub);
+  const frame = JSON.stringify(['EVENT', ev]);
+  let n = 0;
+  for (const r of S.relays.values()) if (r.ws && r.ws.readyState === 1) { r.ws.send(frame); n++; }
+  if (!n) log('Aucun relais de signalisation joignable : message non envoyé', 'ko');
+}
+
+/* ============ Réception de la signalisation ============ */
+async function handleEvent(ev) {
+  let msg;
+  try { msg = await unseal(ev.content); } catch { return; }   // pas chiffré avec notre clé : ignoré
+  if (!msg || msg.from === S.myId) return;
+  if (msg.to && msg.to !== S.myId) return;
+  if (Math.abs(Date.now() - msg.ts) > 10 * 60 * 1000) return; // anti-rejeu grossier
+  if (S.banned.has(msg.from)) return;
+  if (msg.hp) await checkHostClaim(msg);
+  if (!allowed(msg)) return;
+  try {
+    if (msg.t === 'hello') await onHello(msg);
+    else if (msg.t === 'offer') await onOffer(msg);
+    else if (msg.t === 'answer') await onAnswer(msg);
+  } catch (e) { log('Erreur signalisation (' + msg.t + ') : ' + e.message, 'ko'); }
+}
+async function onHello(msg) {
+  let p = S.peers.get(msg.from);
+  if (!p) {
+    p = ensurePeer(msg.from, msg.name);
+    log('Pair découvert : ' + (msg.name || msg.from));
+    send({ t: 'hello', to: msg.from });
+  }
+  if (S.myId < msg.from) {                   // le plus petit identifiant envoie l'offre
+    if (!p.offerMsg) await makeOffer(p);
+    else if (p.pc.connectionState !== 'connected') send(p.offerMsg);
+  }
+}
+async function onOffer(msg) {
+  const p = ensurePeer(msg.from, msg.name);
+  if (p.answerMsg) { if (p.pc.connectionState !== 'connected') send(p.answerMsg); return; }
+  if (p.answering) return;
+  p.answering = true;
+  await p.pc.setRemoteDescription({ type: 'offer', sdp: msg.sdp });
+  for (const tr of p.pc.getTransceivers()) { try { tr.direction = 'sendrecv'; } catch { /* ignoré */ } }
+  await attachLocal(p);                          // côté réponse : on branche nos pistes sur les transceivers issus de l'offre
+  await p.pc.setLocalDescription(await p.pc.createAnswer());
+  await gathered(p.pc);
+  p.answerMsg = { t: 'answer', to: p.id, sdp: p.pc.localDescription.sdp };
+  await send(p.answerMsg);
+  log('Réponse envoyée à ' + (p.name || p.id));
+}
+async function onAnswer(msg) {
+  const p = S.peers.get(msg.from);
+  if (!p || p.pc.signalingState !== 'have-local-offer') return;
+  await p.pc.setRemoteDescription({ type: 'answer', sdp: msg.sdp });
+  log('Réponse reçue de ' + (p.name || p.id));
+}
+async function makeOffer(p) {
+  p.dc = p.pc.createDataChannel('chat'); setupDc(p, p.dc);
+  p.fdc = p.pc.createDataChannel('files'); setupFdc(p, p.fdc);
+  await p.pc.setLocalDescription(await p.pc.createOffer());
+  await gathered(p.pc);
+  p.offerMsg = { t: 'offer', to: p.id, sdp: p.pc.localDescription.sdp };
+  await send(p.offerMsg);
+  log('Offre envoyée à ' + (p.name || p.id));
+}
+
+/* ============ Pairs WebRTC ============ */
+function ensurePeer(id, name) {
+  let p = S.peers.get(id); if (p) return p;
+  const iceServers = []; if (S.stun.length) iceServers.push({ urls: S.stun }); iceServers.push(...S.turn);
+  const pc = new RTCPeerConnection({ iceServers, iceTransportPolicy: S.force ? 'relay' : 'all' });
+  p = { id, name: name || id, pc, dc: null, fdc: null, stream: new MediaStream(), offerMsg: null, answerMsg: null, answering: false,
+        isHost: S.hostIds.has(id), mic: undefined, cam: undefined, screenWanted: false, tile: null, screenStream: new MediaStream(), screenOn: false, screenTile: null, ctl: false, ctlPending: false, cands: {}, sas: '', route: '', routeCls: '', icertt: null, rtt: null, kin: null, kout: null, last: null, joined: false };
+  S.peers.set(id, p);
+  // Seul l'émetteur de l'offre crée ses émetteurs/récepteurs. Côté réponse, les transceivers créés à l'avance ne sont PAS
+  // réutilisés par le navigateur (ils resteraient sans identifiant et n'enverraient jamais rien) : ils sont attachés dans onOffer.
+  if (S.myId < id) { for (const kind of ['audio', 'video', 'video']) pc.addTransceiver(kind, { direction: 'sendrecv' }); }   // 0 micro, 1 caméra, 2 écran
+  pc.onicecandidate = e => { if (e.candidate) p.cands[e.candidate.type] = (p.cands[e.candidate.type] || 0) + 1; };
+  pc.ontrack = e => {
+    const t = e.track, isScr = p.pc.getTransceivers().indexOf(e.transceiver) === 2, tid = (isScr ? 'scr-' : '') + p.id;
+    (isScr ? p.screenStream : p.stream).addTrack(t); log('Piste ' + (isScr ? 'écran' : t.kind) + ' reçue de ' + p.name + (t.muted ? ' (en attente de données)' : ''));
+    t.onunmute = () => { log('Flux ' + (isScr ? 'écran' : t.kind) + ' de ' + p.name + ' : données reçues', 'ok'); playTile(tid); };
+    playTile(tid); applyPeerPerms(p);
+  };
+  pc.ondatachannel = e => {
+    if (e.channel.label === 'files') { p.fdc = e.channel; setupFdc(p, e.channel); }
+    else { p.dc = e.channel; setupDc(p, e.channel); }
+  };
+  pc.onconnectionstatechange = async () => {
+    const st = pc.connectionState;
+    log('Connexion avec ' + p.name + ' : ' + st, st === 'connected' ? 'ok' : st === 'failed' ? 'ko' : '');
+    if (st === 'connected') {
+      p.sas = await computeSas(p);
+      if (!p.joined) { p.joined = true; addChat('', p.name + ' a rejoint la réunion', false, true); }
+      setOwnerAvail(p.id, true);
+    }
+    if (st === 'disconnected') setOwnerAvail(p.id, false);
+    if (st === 'failed' || st === 'closed') {
+      if (p.joined) { p.joined = false; addChat('', p.name + ' a quitté la réunion', false, true); }
+      dropOwner(p.id); showRemoteScreen(p, false); if (S.ctl === p.id) endControl(false); if (S.ctlReq === p.id) { S.ctlReq = null; $('#ctlbar').hidden = true; }
+      if (st === 'failed') log('Échec P2P avec ' + p.name + (p.cands.srflx ? '' : ' — aucun candidat srflx : STUN/UDP probablement bloqué') + ' → configurez un relais TURN (TCP/443)', 'ko');
+    }
+    schedule(renderConn);
+  };
+  p.tile = addTile('tile-' + id, p.name, p.stream, false);
+  attachLocal(p); applyPeerPerms(p); schedule(renderPeople);
+  schedule(renderConn);
+  return p;
+}
+function setupDc(p, dc) {
+  dc.onopen = () => { log('Canal de discussion ouvert avec ' + p.name, 'ok'); sendCatalog(p); if (S.screen) dcSend(p, { t: 'screen', on: true }); sendStatus(p); if (S.isHost) pushState(p); schedule(renderConn); };
+  dc.onclose = () => { setOwnerAvail(p.id, false); };
+  dc.onmessage = e => onDcMessage(p, e);
+}
+function dcSend(p, obj) { if (p.dc && p.dc.readyState === 'open') p.dc.send(JSON.stringify(obj)); }
+function bcast(obj) { for (const p of S.peers.values()) dcSend(p, obj); }
+function onDcMessage(p, e) {
+  let m; try { m = JSON.parse(e.data); } catch { return; }
+  switch (m.t) {
+    case 'chat': if (permsOf(p.id).chat) addChat(p.name, String(m.text).slice(0, 4000)); break;
+    case 'st': p.mic = !!m.mic; p.cam = !!m.cam; schedule(renderPeople); break;
+    case 'hcmd': onHostCmd(p, m); break;
+    case 'ping': dcSend(p, { t: 'pong', ts: m.ts }); break;
+    case 'pong': p.rtt = Math.round(performance.now() - m.ts); break;
+    case 'screen': p.screenWanted = !!m.on; showRemoteScreen(p, p.screenWanted && permsOf(p.id).screen); break;
+    case 'ctl': onCtl(p, m); break;
+    case 'files': if (permsOf(p.id).files) setCatalog(p, m.list); break;
+    case 'fadd': if (permsOf(p.id).files) addRemoteFile(p, m.meta); break;
+    case 'frm': removeRemoteFile(p, m.fid); break;
+    case 'fget': serveFile(p, m.rid, m.fid); break;
+    case 'fack': { const tr = S.transfers.get(tkey(p, m.rid)); if (tr && tr.dir === 'up') { tr.acked = m.bytes; if (tr.wake) tr.wake(); } break; }
+    case 'fcancel': {
+      const tr = S.transfers.get(tkey(p, m.rid)); if (!tr || tr.finished) break;
+      if (tr.dir === 'up') { tr.cancelled = true; endTransfer(tr, 'annulé'); if (tr.wake) tr.wake(); }
+      else failTransfer(tr, 'annulé par l’expéditeur', 'annulé');
+      break;
+    }
+    case 'ferr': { const tr = S.transfers.get(tkey(p, m.rid)); if (tr) failTransfer(tr, String(m.msg || 'erreur')); break; }
+  }
+}
+// Code de vérification court (SAS) dérivé des deux empreintes DTLS, à comparer à l'oral
+const fpOf = sdp => (sdp.match(/a=fingerprint:\S+ ([0-9A-F:]+)/i) || [])[1] || '';
+async function computeSas(p) {
+  const a = fpOf(p.pc.localDescription.sdp), b = fpOf(p.pc.remoteDescription.sdp);
+  const h = new Uint8Array(await sha256(enc.encode([a, b].sort().join('|'))));
+  const n = ((h[0] << 24 | h[1] << 16 | h[2] << 8 | h[3]) >>> 0) % 1000000;
+  return String(n).padStart(6, '0').replace(/(\d{3})(\d{3})/, '$1 $2');
+}
+
+/* ============ Vidéo : tuiles, caméra, micro ============ */
+function addTile(id, label, stream, muted) {
+  const tile = document.createElement('div'); tile.className = 'tile'; tile.id = id;
+  const ph = document.createElement('div'); ph.className = 'ph'; ph.textContent = (label || '?').trim().charAt(0).toUpperCase();
+  const v = document.createElement('video'); v.autoplay = true; v.playsInline = true; v.muted = !!muted; v.srcObject = stream;
+  const nm = document.createElement('div'); nm.className = 'nm'; nm.textContent = label;
+  tile.append(ph, v, nm); $('#tiles').appendChild(tile);
+  tile._play = () => {                         // lecture explicite : certains navigateurs ne démarrent pas seuls un flux dont les pistes arrivent après coup
+    if (!v.paused && v.readyState > 1) return;
+    const r = v.play(); if (r && r.catch) r.catch(() => { if (!v.muted) { v.muted = true; v.play().catch(() => {}); tile._silent = true; } });
+  };
+  v.addEventListener('loadedmetadata', tile._play); v.addEventListener('resize', tile._play);
+  tile._play();
+  return tile;
+}
+const playTile = id => { const t = document.getElementById && document.getElementById('tile-' + id); if (t && t._play) t._play(); };
+// un clic n'importe où réactive le son des tuiles qui ont dû démarrer en sourdine
+document.addEventListener('click', () => { $$('.tile').forEach(t => { if (t._silent && t.id !== 'tile-me') { const v = t.querySelector('video'); v.muted = false; t._silent = false; v.play().catch(() => {}); } }); });
+async function startLocalMedia(cam, mic) {
+  const want = {};
+  if (cam && !(S.local && S.local.getVideoTracks().length)) want.video = { width: 1280, height: 720, frameRate: 30 };
+  if (mic && !(S.local && S.local.getAudioTracks().length)) want.audio = { echoCancellation: true, noiseSuppression: true, autoGainControl: true };
+  if (!want.video && !want.audio) { updateCtrl(); return; }
+  let got = null;
+  try { got = await navigator.mediaDevices.getUserMedia(want); }
+  catch (e) {
+    if (want.video && want.audio) {            // caméra occupée ou absente : on tente le micro seul
+      log('Caméra indisponible (' + e.name + ') : essai du micro seul', 'warn');
+      try { got = await navigator.mediaDevices.getUserMedia({ audio: want.audio }); } catch (e2) { e = e2; }
+    }
+    if (!got) { log('Caméra/micro indisponibles (' + e.name + ')', 'warn'); toast('Caméra ou micro indisponible (' + e.name + ')'); updateCtrl(); return; }
+  }
+  const first = !S.local;
+  if (first) S.local = new MediaStream();
+  got.getTracks().forEach(t => S.local.addTrack(t));
+  if (first) { addTile('tile-me', S.name + ' (moi)', S.local, true); $('#tile-me').parentNode.insertBefore($('#tile-me'), $('#tiles').firstChild); }
+  for (const p of S.peers.values()) attachLocal(p);
+  log('Médias locaux : ' + S.local.getTracks().map(t => t.kind + ' (' + (t.label || '?') + ')').join(', '), 'ok');
+  if (!S.local.getVideoTracks().length && cam) addChat('', 'Aucune caméra disponible sur ce navigateur : vous êtes en audio seul (caméra déjà utilisée par un autre navigateur ?).', false, true);
+  updateCtrl();
+}
+function setCtrl(sel, track, onIcon, offIcon, label) {
+  const b = $(sel), active = !!track && track.enabled;
+  b.classList.toggle('off', !active);
+  b.querySelector('[data-i]').innerHTML = ICONS[active ? onIcon : offIcon];
+  b.title = !track ? label + ' : cliquer pour activer' : active ? label + ' actif (cliquer pour couper)' : label + ' coupé (cliquer pour réactiver)';
+}
+function updateCtrl() {
+  setCtrl('#cMic', S.local && S.local.getAudioTracks()[0], 'mic', 'micoff', 'Micro');
+  setCtrl('#cCam', S.local && S.local.getVideoTracks()[0], 'video', 'videooff', 'Caméra');
+  sendStatus(); schedule(renderPeople);
+}
+function toggleTrack(kind) {
+  if (!permsOf(S.myId)[kind === 'audio' ? 'mic' : 'cam']) { toast('L’hôte n’autorise pas cette action.'); return; }
+  const ts = S.local ? S.local.getTracks().filter(t => t.kind === kind) : [];
+  if (!ts.length) { startLocalMedia(kind === 'video', kind === 'audio'); return; }
+  const on = !ts[0].enabled; ts.forEach(t => { t.enabled = on; }); updateCtrl();
+}
+
+/* ============ Partage d'écran ============ */
+// Chaque liaison porte 3 flux : 0 micro, 1 caméra, 2 écran. L'écran est un flux vidéo à part, affiché dans une grande tuile.
+const trackFor = i => i === 0 ? (S.local && S.local.getAudioTracks()[0]) : i === 1 ? (S.local && S.local.getVideoTracks()[0]) : (S.screen && S.screen.getVideoTracks()[0]);
+async function attachLocal(p) {
+  const trs = p.pc.getTransceivers();
+  for (let i = 0; i < Math.min(3, trs.length); i++) {
+    const t = trackFor(i); if (!t) continue;
+    try { await trs[i].sender.replaceTrack(t); } catch (e) { log('Attachement de la piste locale impossible : ' + e.message, 'ko'); }
+  }
+}
+async function startScreen() {
+  if (S.screen) return;
+  if (!permsOf(S.myId).screen) { toast('L’hôte n’autorise pas le partage d’écran.'); return; }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) { toast('Le partage d’écran n’est pas disponible sur cet appareil.'); return; }
+  let st;
+  try { st = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 15 }, audio: false }); }
+  catch (e) { if (e.name !== 'NotAllowedError') toast('Partage d’écran impossible (' + e.name + ')'); return; }
+  const vt = st.getVideoTracks()[0]; if (!vt) return;
+  try { vt.contentHint = 'detail'; } catch { /* ignoré */ }
+  S.screen = st; vt.onended = stopScreen;
+  const t = addTile('tile-scr-me', 'Votre écran', st, true); t.classList.add('screen'); S.screenTile = t;
+  $('#tiles').insertBefore(t, $('#tiles').firstChild);
+  for (const p of S.peers.values()) { await attachLocal(p); }
+  bcast({ t: 'screen', on: true });
+  $('#cScreen').classList.add('on'); $('#cScreen').title = 'Arrêter le partage d’écran';
+  addChat('', 'Vous partagez votre écran', false, true);
+}
+function stopScreen() {
+  if (!S.screen) return;
+  S.screen.getTracks().forEach(t => { t.onended = null; t.stop(); }); S.screen = null;
+  if (S.screenTile) { S.screenTile.remove(); S.screenTile = null; }
+  for (const p of S.peers.values()) { const tr = p.pc.getTransceivers()[2]; if (tr) tr.sender.replaceTrack(null).catch(() => {}); }
+  bcast({ t: 'screen', on: false });
+  endControl(true); $('#ctlbar').hidden = true; S.ctlReq = null;
+  $('#cScreen').classList.remove('on'); $('#cScreen').title = 'Partager votre écran';
+  addChat('', 'Vous avez arrêté le partage d’écran', false, true);
+}
+function showRemoteScreen(p, on) {
+  p.screenOn = on;
+  if (on && !p.screenTile) {
+    const t = addTile('tile-scr-' + p.id, p.name + ' · écran', p.screenStream, true); t.classList.add('screen'); p.screenTile = t;
+    const tb = document.createElement('div'); tb.className = 'tb';
+    const b = document.createElement('button'); b.className = 'btn sm'; b.setAttribute('data-ctl', '1'); b.textContent = 'Demander le contrôle';
+    b.title = 'Prendre la main sur l’ordinateur de ' + p.name + ' (avec son accord)';
+    b.onclick = e => { e.stopPropagation(); toggleControl(p); };
+    tb.appendChild(b); t.appendChild(tb);
+    t.ondblclick = () => { if (!p.ctl && t.requestFullscreen) t.requestFullscreen().catch(() => {}); };
+    bindCtl(p, t);
+    $('#tiles').insertBefore(t, $('#tiles').firstChild);
+    addChat('', p.name + ' partage son écran', false, true);
+  } else if (!on && p.screenTile) {
+    p.screenTile.remove(); p.screenTile = null; p.ctl = false; p.ctlPending = false;
+    addChat('', p.name + ' a arrêté le partage d’écran', false, true);
+  }
+}
+
+/* ============ Prise de contrôle à distance (avec accord de l'hôte, pour la session en cours) ============ */
+// Le navigateur ne peut pas piloter le système : dans cette page, le contrôle s'affiche sous forme de pointeur distant.
+// Le pilotage réel (souris/clavier du système) sera fait par l'application de bureau, qui fournira window.lusNative.inject(evt).
+const hasNative = () => !!(window.lusNative && typeof window.lusNative.inject === 'function');
+function updCtlBtn(p) {
+  const t = p.screenTile; if (!t) return; const b = t.querySelector('[data-ctl]'); if (!b) return;
+  b.textContent = p.ctl ? 'Arrêter le contrôle' : p.ctlPending ? 'En attente de l’accord…' : 'Demander le contrôle';
+  b.classList.toggle('danger', !!p.ctl); t.classList.toggle('ctl', !!p.ctl);
+}
+function toggleControl(p) {
+  if (!permsOf(S.myId).ctl) { toast('L’hôte n’autorise pas la demande de contrôle.'); return; }
+  if (p.ctl || p.ctlPending) { p.ctl = false; p.ctlPending = false; dcSend(p, { t: 'ctl', a: 'end' }); }
+  else { p.ctlPending = true; dcSend(p, { t: 'ctl', a: 'req' }); }
+  updCtlBtn(p);
+}
+function bindCtl(p, tile) {
+  const v = tile.querySelector('video'); tile.tabIndex = 0; let last = 0;
+  const pos = e => {
+    const r = v.getBoundingClientRect(), vw = v.videoWidth || 16, vh = v.videoHeight || 9, sc = Math.min(r.width / vw, r.height / vh), w = vw * sc, h = vh * sc;
+    const x = (e.clientX - (r.left + (r.width - w) / 2)) / w, y = (e.clientY - (r.top + (r.height - h) / 2)) / h;
+    return x < 0 || x > 1 || y < 0 || y > 1 ? null : { x, y };
+  };
+  const snd = o => { if (p.ctl) dcSend(p, { t: 'ctl', a: 'ev', e: o }); };
+  v.addEventListener('mousemove', e => { const q = pos(e); if (!q || !p.ctl) return; const n = performance.now(); if (n - last < 30) return; last = n; snd({ k: 'mm', ...q }); });
+  v.addEventListener('mousedown', e => { tile.focus(); const q = pos(e); if (q && p.ctl) { e.preventDefault(); snd({ k: 'md', b: e.button, ...q }); } });
+  v.addEventListener('mouseup', e => { const q = pos(e); if (q && p.ctl) { e.preventDefault(); snd({ k: 'mu', b: e.button, ...q }); } });
+  v.addEventListener('wheel', e => { if (p.ctl) { e.preventDefault(); snd({ k: 'wh', dx: e.deltaX, dy: e.deltaY }); } }, { passive: false });
+  v.addEventListener('contextmenu', e => { if (p.ctl) e.preventDefault(); });
+  for (const [ev, k] of [['keydown', 'kd'], ['keyup', 'ku']]) tile.addEventListener(ev, e => { if (p.ctl) { e.preventDefault(); snd({ k, key: String(e.key).slice(0, 20), code: String(e.code).slice(0, 20), ctrl: e.ctrlKey, alt: e.altKey, shift: e.shiftKey, meta: e.metaKey }); } });
+}
+function showCtlBar(mode, p) {
+  const bar = $('#ctlbar'); bar.hidden = false;
+  $('#ctlTxt').textContent = mode === 'req' ? p.name + ' demande à prendre le contrôle de votre ordinateur.' : p.name + ' contrôle votre ordinateur' + (hasNative() ? '.' : ' (mode pointeur : le navigateur ne peut pas piloter le système).');
+  $('#ctlOk').hidden = mode !== 'req'; $('#ctlNo').hidden = mode !== 'req'; $('#ctlStop').hidden = mode !== 'active';
+}
+function endControl(notify) {
+  if (!S.ctl) return;
+  const p = S.peers.get(S.ctl); if (p && notify) dcSend(p, { t: 'ctl', a: 'end' });
+  S.ctl = null; $('#rptr').hidden = true; $('#ctlbar').hidden = true;
+}
+function onCtl(p, m) {
+  if (m.a === 'req') {
+    if (!permsOf(p.id).ctl) { dcSend(p, { t: 'ctl', a: 'deny', why: 'non autorisé par l’hôte' }); return; }
+    if (!S.screen) { dcSend(p, { t: 'ctl', a: 'deny', why: 'aucun écran partagé' }); return; }
+    if (S.ctl || S.ctlReq) { dcSend(p, { t: 'ctl', a: 'deny', why: 'une autre demande est en cours' }); return; }
+    S.ctlReq = p.id; showCtlBar('req', p); toast(p.name + ' demande le contrôle de votre ordinateur', 6000);
+  } else if (m.a === 'grant') {
+    if (!p.ctlPending) return;
+    p.ctl = true; p.ctlPending = false; updCtlBtn(p);
+    toast(m.native ? 'Contrôle accordé' : 'Contrôle accordé en mode pointeur : seul l’application de bureau peut piloter réellement le poste.', 6000);
+    if (p.screenTile) p.screenTile.focus();
+  } else if (m.a === 'deny') {
+    p.ctlPending = false; p.ctl = false; updCtlBtn(p); toast(p.name + ' a refusé le contrôle' + (m.why ? ' (' + String(m.why).slice(0, 60) + ')' : ''));
+  } else if (m.a === 'end') {
+    if (S.ctl === p.id) { endControl(false); toast(p.name + ' a arrêté le contrôle'); }
+    if (S.ctlReq === p.id) { S.ctlReq = null; $('#ctlbar').hidden = true; }
+    p.ctl = false; p.ctlPending = false; updCtlBtn(p);
+  } else if (m.a === 'ev') {
+    if (S.ctl !== p.id || !S.screen || !m.e || typeof m.e !== 'object') return;   // uniquement la personne autorisée, tant que l'écran est partagé
+    const e = m.e, c = n => Math.min(1, Math.max(0, Number(n) || 0));
+    const ev = { k: String(e.k), x: c(e.x), y: c(e.y), b: Number(e.b) || 0, dx: Number(e.dx) || 0, dy: Number(e.dy) || 0, key: String(e.key || '').slice(0, 20), code: String(e.code || '').slice(0, 20), ctrl: !!e.ctrl, alt: !!e.alt, shift: !!e.shift, meta: !!e.meta };
+    if (!['mm', 'md', 'mu', 'wh', 'kd', 'ku'].includes(ev.k)) return;
+    if (hasNative()) { try { window.lusNative.inject(ev); } catch (er) { log('Injection impossible : ' + er.message, 'ko'); } return; }
+    if (ev.k === 'mm' || ev.k === 'md' || ev.k === 'mu') {
+      const r = $('#rptr'); r.hidden = false; r.style.left = Math.round(ev.x * innerWidth) + 'px'; r.style.top = Math.round(ev.y * innerHeight) + 'px';
+      r.querySelector('b').textContent = p.name;
+      if (ev.k === 'md') { const i = r.querySelector('i'); i.classList.remove('click'); void i.offsetWidth; i.classList.add('click'); }
+    }
+  }
+}
+
+/* ============ Gestion de la réunion : hôte, droits, exclusion ============ */
+// Sans serveur, l'autorité de l'hôte repose sur sa clé : l'empreinte (SHA-256) de sa clé publique ECDSA est dans le lien d'invitation.
+// L'hôte signe ses commandes ; chaque participant vérifie la signature. Les droits sont appliqués chez CHAQUE participant
+// (un client modifié peut les ignorer pour lui-même, mais les autres ne l'affichent / ne l'écoutent plus).
+const PERMS = [['chat', 'Chat'], ['mic', 'Micro'], ['cam', 'Caméra'], ['screen', 'Écran'], ['files', 'Fichiers'], ['ctl', 'Contrôle']];
+const ALLP = Object.fromEntries(PERMS.map(([k]) => [k, true]));
+const ECP = { name: 'ECDSA', namedCurve: 'P-256' }, ECS = { name: 'ECDSA', hash: 'SHA-256' };
+const jwkCanon = j => JSON.stringify({ crv: j.crv, kty: j.kty, x: j.x, y: j.y });
+const hostFpOf = async j => b64u(new Uint8Array(await sha256(enc.encode(jwkCanon(j)))).slice(0, 16));
+async function makeHostKey() {
+  const kp = await crypto.subtle.generateKey(ECP, true, ['sign', 'verify']);
+  return { pub: await crypto.subtle.exportKey('jwk', kp.publicKey), priv: kp.privateKey, privJwk: await crypto.subtle.exportKey('jwk', kp.privateKey) };
+}
+async function loadHostKey(fp) {
+  try {
+    const raw = ls.get('hk.' + fp); if (!raw) return null; const { pub, priv } = JSON.parse(raw);
+    if ((await hostFpOf(pub)) !== fp) return null;
+    return { pub, priv: await crypto.subtle.importKey('jwk', priv, ECP, false, ['sign']) };
+  } catch { return null; }
+}
+const signHost = async str => b64(new Uint8Array(await crypto.subtle.sign(ECS, S.hostKey.priv, enc.encode(str))));
+async function checkHostClaim(msg) {              // l'expéditeur prouve qu'il détient la clé de l'hôte
+  const c = msg.hp; if (!c || !S.hostfp || S.isHost) return false;
+  if (S.hostIds.has(msg.from)) return true;
+  try {
+    if (Math.abs(Date.now() - c.ts) > 12 * 3600e3) return false;
+    if ((await hostFpOf(c.pub)) !== S.hostfp) return false;
+    const key = await crypto.subtle.importKey('jwk', c.pub, ECP, false, ['verify']);
+    if (!(await crypto.subtle.verify(ECS, key, ub64(c.sig), enc.encode(['lus-host', S.roomId, msg.from, c.ts].join('|'))))) return false;
+    S.hostPub = key; S.hostIds.add(msg.from);
+    const p = S.peers.get(msg.from); if (p) p.isHost = true;
+    log('Hôte de la réunion identifié : ' + (msg.name || msg.from), 'ok'); schedule(renderPeople); return true;
+  } catch { return false; }
+}
+const permsOf = id => {
+  if (S.isHost && id === S.myId) return ALLP;
+  const p = S.peers.get(id); if (p && p.isHost) return ALLP;
+  return Object.prototype.hasOwnProperty.call(S.hs.perms, id) ? S.hs.perms[id] : S.hs.defaults;
+};
+const cleanPerms = o => Object.fromEntries(PERMS.map(([k]) => [k, !(o && o[k] === false)]));
+const cleanMap = o => { const r = {}; if (o && typeof o === 'object') for (const id of Object.keys(o).slice(0, 64)) if (/^[0-9a-f]{8}$/.test(id)) r[id] = cleanPerms(o[id]); return r; };
+function allowed(msg) {                           // réunion verrouillée : seuls les participants admis par l'hôte peuvent entrer
+  if (S.isHost) {
+    if (!S.hs.locked || S.admitted.has(msg.from) || S.peers.has(msg.from)) return true;
+    if (msg.t === 'hello') {
+      if (!S.pendingJoin.has(msg.from)) toast((msg.name || 'Quelqu’un') + ' demande à rejoindre la réunion (onglet Personnes)', 6000);
+      S.pendingJoin.set(msg.from, { name: msg.name || msg.from, msg, ts: Date.now() }); schedule(renderPeople);
+    }
+    return false;
+  }
+  return !S.hs.locked || S.hostIds.has(msg.from) || S.admitted.has(msg.from);
+}
+const nextSeq = () => (S.seqLast = Math.max(Date.now() * 1000, S.seqLast + 1));
+async function hostCmd(act, extra, toId) {
+  if (!S.isHost) return;
+  const body = JSON.stringify({ room: S.roomId, seq: nextSeq(), ts: Date.now(), act, ...(extra || {}), ...(toId ? { to: toId } : {}) });
+  const m = { t: 'hcmd', body, sig: await signHost(body) };
+  if (toId) { const p = S.peers.get(toId); if (p) dcSend(p, m); } else bcast(m);
+}
+async function pushState(target) {
+  if (!S.isHost) return;
+  await hostCmd('state', { locked: S.hs.locked, defaults: S.hs.defaults, perms: S.hs.perms, admitted: [...new Set([...S.admitted, ...S.peers.keys()])] }, target && target.id);
+  if (!target) { applyAll(); renderPeople(); }
+}
+async function onHostCmd(p, m) {
+  if (!p.isHost || !S.hostPub || typeof m.body !== 'string' || typeof m.sig !== 'string') return;
+  let ok = false; try { ok = await crypto.subtle.verify(ECS, S.hostPub, ub64(m.sig), enc.encode(m.body)); } catch { /* signature invalide */ }
+  if (!ok) { log('Commande d’hôte refusée : signature invalide', 'ko'); return; }
+  let b; try { b = JSON.parse(m.body); } catch { return; }
+  if (b.room !== S.roomId || Math.abs(Date.now() - b.ts) > 10 * 60 * 1000) return;
+  if (b.to && b.to !== S.myId) return;
+  switch (b.act) {
+    case 'state': {
+      if (!(b.seq > S.hs.seq)) return;
+      S.hs = { locked: !!b.locked, defaults: cleanPerms(b.defaults), perms: cleanMap(b.perms), seq: b.seq };
+      if (S.hs.locked) for (const id of S.peers.keys()) S.admitted.add(id);
+      for (const id of (Array.isArray(b.admitted) ? b.admitted : []).slice(0, 64)) {
+        if (typeof id !== 'string' || !/^[0-9a-f]{8}$/.test(id) || id === S.myId || S.admitted.has(id)) continue;
+        S.admitted.add(id); if (!S.peers.has(id)) send({ t: 'hello', to: id });   // un nouvel admis : on va à sa rencontre
+      }
+      applyAll(); schedule(renderPeople); break;
+    }
+    case 'mute': case 'muteall': {
+      const kind = b.act === 'muteall' ? 'mic' : b.kind;
+      if (kind === 'mic' && S.local) S.local.getAudioTracks().forEach(t => { t.enabled = false; });
+      else if (kind === 'cam' && S.local) S.local.getVideoTracks().forEach(t => { t.enabled = false; });
+      else if (kind === 'screen') stopScreen();
+      updateCtrl(); toast('L’hôte a coupé ' + (kind === 'mic' ? 'votre micro' : kind === 'cam' ? 'votre caméra' : 'votre partage d’écran'), 5000); break;
+    }
+    case 'kick': {
+      if (b.peerId === S.myId) { ls.set('notice', 'Vous avez été exclu(e) de la réunion par l’hôte.'); leave(); }
+      else if (typeof b.peerId === 'string') banPeer(b.peerId);
+      break;
+    }
+  }
+}
+function applyMyPerms() {
+  const pm = permsOf(S.myId);
+  if (!pm.mic && S.local) S.local.getAudioTracks().forEach(t => { t.enabled = false; });
+  if (!pm.cam && S.local) S.local.getVideoTracks().forEach(t => { t.enabled = false; });
+  if (!pm.screen && S.screen) stopScreen();
+  const dis = (sel, v, why) => { const e = $(sel); e.disabled = !v; if (!v) e.title = why; };
+  dis('#cMic', pm.mic, 'Micro désactivé par l’hôte'); dis('#cCam', pm.cam, 'Caméra désactivée par l’hôte'); dis('#cScreen', pm.screen, 'Partage d’écran désactivé par l’hôte');
+  dis('#bSend', pm.chat, 'Chat désactivé par l’hôte'); dis('#bAddFiles', pm.files, 'Partage de fichiers désactivé par l’hôte');
+  $('#chatIn').disabled = !pm.chat; $('#chatIn').placeholder = pm.chat ? 'Écrire un message…' : 'Chat désactivé par l’hôte';
+  updateCtrl();
+}
+function applyPeerPerms(p) {                      // côté réception : on n'entend / ne voit pas ce que l'hôte a interdit à ce participant
+  const pm = permsOf(p.id);
+  p.stream.getAudioTracks().forEach(t => { t.enabled = pm.mic; });
+  p.stream.getVideoTracks().forEach(t => { t.enabled = pm.cam; });
+  if (p.tile) { const v = p.tile.querySelector('video'); if (v) v.style.visibility = pm.cam ? '' : 'hidden'; }
+  showRemoteScreen(p, p.screenWanted && pm.screen);
+}
+function applyAll() { applyMyPerms(); for (const p of S.peers.values()) applyPeerPerms(p); }
+function sendStatus(p) {
+  const a = S.local && S.local.getAudioTracks()[0], v = S.local && S.local.getVideoTracks()[0], m = { t: 'st', mic: !!(a && a.enabled), cam: !!(v && v.enabled) };
+  if (p) dcSend(p, m); else bcast(m);
+}
+function closePeer(p) {
+  try { p.pc.close(); } catch { /* ignoré */ }
+  if (p.tile) p.tile.remove(); if (p.screenTile) p.screenTile.remove(); p.screenTile = null;
+  S.peers.delete(p.id); dropOwner(p.id); if (S.ctl === p.id) endControl(false);
+  addChat('', p.name + ' a été exclu(e) de la réunion', false, true); schedule(renderConn); schedule(renderPeople);
+}
+function banPeer(id) { S.banned.add(id); S.pendingJoin.delete(id); const p = S.peers.get(id); if (p) closePeer(p); }
+async function kickPeer(id) {
+  S.banned.add(id);
+  await hostCmd('kick', { peerId: id });
+  setTimeout(() => banPeer(id), 700);             // laisse partir la commande avant de couper la liaison
+  S.hs.locked = true; for (const q of S.peers.keys()) S.admitted.add(q);
+  await pushState();
+}
+async function toggleLock() {
+  S.hs.locked = !S.hs.locked;
+  if (S.hs.locked) for (const q of S.peers.keys()) S.admitted.add(q); else S.pendingJoin.clear();
+  await pushState(); toast(S.hs.locked ? 'Réunion verrouillée : les nouveaux venus doivent être admis par vous.' : 'Réunion déverrouillée.');
+}
+async function admit(id) {
+  const e = S.pendingJoin.get(id); S.pendingJoin.delete(id); S.admitted.add(id);
+  await pushState(); if (e) await onHello(e.msg); renderPeople();
+}
+function setPerm(id, k) { const cur = { ...permsOf(id) }; cur[k] = !cur[k]; S.hs.perms[id] = cur; pushState(); }
+function renderPeople() {
+  const box = $('#peopleList'); if (!box) return;
+  const now = Date.now(); for (const [id, e] of S.pendingJoin) if (now - e.ts > 20000) S.pendingJoin.delete(id);
+  const n = S.isHost ? S.pendingJoin.size : 0, bd = $('#bdPeople'); bd.textContent = n; bd.hidden = !n;
+  if (!S.inRoom) return;
+  const st = (mic, cam) => (mic === false ? `<span class="ico ko" title="Micro coupé">${ICONS.micoff}</span>` : '') + (cam === false ? `<span class="ico ko" title="Caméra coupée">${ICONS.videooff}</span>` : '');
+  const chips = (id, isDef) => PERMS.map(([k, lab]) => { const on = isDef ? S.hs.defaults[k] : permsOf(id)[k]; return `<button class="chip${on ? ' on' : ''}" data-act="${isDef ? 'defperm' : 'perm'}" data-id="${id || ''}" data-k="${k}" title="${on ? 'Autorisé : cliquer pour interdire' : 'Interdit : cliquer pour autoriser'}">${lab}</button>`; }).join('');
+  const a = S.local && S.local.getAudioTracks()[0], v = S.local && S.local.getVideoTracks()[0];
+  let h = '';
+  if (S.isHost) {
+    h += `<div class="box"><div class="sh"><span>Gestion de la réunion</span></div>
+      <div class="row"><button class="btn sm" data-act="muteall">Couper tous les micros</button><button class="btn sm${S.hs.locked ? ' on' : ''}" data-act="lock">${S.hs.locked ? 'Réunion verrouillée' : 'Verrouiller la réunion'}</button></div>
+      <div class="hint">Verrouillée, personne ne peut entrer sans votre accord. Droits par défaut des participants :</div><div class="chips">${chips('', true)}</div></div>`;
+    if (S.pendingJoin.size) h += `<div class="box"><div class="sh"><span>En attente d’admission</span></div>${[...S.pendingJoin.entries()].map(([id, e]) => `<div class="row"><span style="flex:1">${esc(e.name)}</span><button class="btn sm primary" data-act="admit" data-id="${esc(id)}">Admettre</button><button class="btn sm" data-act="refuse" data-id="${esc(id)}">Refuser</button></div>`).join('')}</div>`;
+  } else if (S.hostfp) {
+    const pm = permsOf(S.myId), den = PERMS.filter(([k]) => !pm[k]).map(([, l]) => l);
+    h += `<div class="hint">${den.length ? 'Interdit par l’hôte : <b>' + esc(den.join(', ')) + '</b>.' : 'Tous les droits vous sont accordés.'}${S.hs.locked ? ' Réunion verrouillée.' : ''}</div>`;
+  } else h += '<div class="hint">Ce lien ne comporte pas d’hôte : gestion des participants indisponible.</div>';
+  h += `<div class="box"><div class="sh"><span>Participants (${S.peers.size + 1})</span></div>`;
+  h += `<div class="person"><div class="pt"><i class="dot ok"></i>${esc(S.name)} <span class="badge2">Vous</span>${S.isHost ? '<span class="badge2 host">Hôte</span>' : ''}${st(!!(a && a.enabled), !!(v && v.enabled))}</div></div>`;
+  for (const p of S.peers.values()) {
+    const cls = p.pc.connectionState === 'connected' ? 'ok' : p.pc.connectionState === 'failed' ? 'ko' : 'warn';
+    h += `<div class="person"><div class="pt"><i class="dot ${cls}"></i>${esc(p.name)}${p.isHost ? '<span class="badge2 host">Hôte</span>' : ''}${st(p.mic, p.cam)}</div>`;
+    if (S.isHost && !p.isHost) h += `<div class="row" style="gap:4px"><button class="btn sm" data-act="mmic" data-id="${p.id}">Couper micro</button><button class="btn sm" data-act="mcam" data-id="${p.id}">Couper caméra</button>${p.screenOn ? `<button class="btn sm" data-act="mscr" data-id="${p.id}">Arrêter écran</button>` : ''}<button class="btn sm danger" data-act="kick" data-id="${p.id}">Exclure</button></div>
+      <div class="chips">${chips(p.id, false)}</div>`;
+    h += '</div>';
+  }
+  h += '</div>'; if (h === S._phtml) return; S._phtml = h; box.innerHTML = h;     // pas de rafraîchissement inutile (clics perdus)
+}
+
+/* ============ Chat ============ */
+function addChat(who, text, mine, sys) {
+  const d = document.createElement('div'); d.className = 'msg' + (mine ? ' me' : '') + (sys ? ' sys' : '');
+  if (!sys && who) { const w = document.createElement('div'); w.className = 'who'; w.textContent = who; d.appendChild(w); }
+  d.appendChild(document.createTextNode(text));
+  const box = $('#chatList'); box.appendChild(d); box.scrollTop = box.scrollHeight;
+  if (!mine && !sys) bump('chat');
+}
+function sendChat() {
+  const t = $('#chatIn').value.trim(); if (!t) return;
+  if (!permsOf(S.myId).chat) { toast('L’hôte a désactivé le chat pour vous.'); return; }
+  bcast({ t: 'chat', text: t }); addChat('Moi', t, true); $('#chatIn').value = '';
+}
+function bump(tab) {
+  if (S.tab === tab && !$('#side').hidden) return;
+  S.unread[tab]++; const b = $('#bd' + (tab === 'chat' ? 'Chat' : 'Files')); b.textContent = S.unread[tab]; b.hidden = false;
+}
+function selectTab(tab) {
+  S.tab = tab; $('#side').hidden = false; $('#bSide').classList.add('on');
+  $$('.stab').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  for (const t of ['chat', 'files', 'people', 'conn']) $('#pane-' + t).hidden = t !== tab;
+  if (S.unread[tab] !== undefined) { S.unread[tab] = 0; $('#bd' + (tab === 'chat' ? 'Chat' : 'Files')).hidden = true; }
+  if (tab === 'conn') renderConn();
+  if (tab === 'files') renderFiles();
+  if (tab === 'people') renderPeople();
+}
+
+/* ============ Fichiers partagés ============ */
+// Catalogue : chaque participant annonce ses fichiers ; les fichiers restent chez leur propriétaire
+// et sont téléchargés directement depuis lui, sur un canal de données dédié ('files').
+const tkey = (p, rid) => p.id + ':' + rid;
+const cleanMeta = m => ({ fid: String(m.fid).slice(0, 40), name: String(m.name).slice(0, 255), size: Math.max(0, Number(m.size) || 0), type: String(m.type || '').slice(0, 100) });
+const safeName = n => String(n).replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_') || 'fichier';
+function myMeta() { return [...S.files.values()].filter(f => f.owner === 'me').map(f => ({ fid: f.fid, name: f.name, size: f.size, type: f.type })); }
+function sendCatalog(p) { const l = myMeta(); if (l.length) dcSend(p, { t: 'files', list: l }); }
+function addLocalFiles(list) {
+  const added = [];
+  if (!permsOf(S.myId).files) { toast('L’hôte n’autorise pas le partage de fichiers.'); return; }
+  for (const file of [...list]) {
+    if (!file || typeof file.size !== 'number' || (file.size === 0 && !file.type && !file.name)) continue;
+    const fid = uid(), f = { fid, name: file.name, size: file.size, type: file.type || '', owner: 'me', ownerName: S.name, file, avail: true };
+    S.files.set('me:' + fid, f); added.push(f);
+    bcast({ t: 'fadd', meta: { fid, name: f.name, size: f.size, type: f.type } });
+    addChat('', 'Vous avez partagé « ' + f.name + ' » (' + fmtSize(f.size) + ')', false, true);
+  }
+  if (added.length) toast(added.length + ' fichier(s) partagé(s)');
+  schedule(renderFiles);
+}
+function removeLocalFile(fid) {
+  S.files.delete('me:' + fid); bcast({ t: 'frm', fid });
+  for (const tr of S.transfers.values()) if (tr.dir === 'up' && tr.fid === fid && !tr.finished) { tr.cancelled = true; endTransfer(tr, 'annulé'); if (tr.wake) tr.wake(); dcSend(tr.peer, { t: 'fcancel', rid: tr.rid }); }
+  schedule(renderFiles);
+}
+function setCatalog(p, list) {
+  for (const [k, f] of S.files) if (f.owner === p.id) S.files.delete(k);
+  let n = 0;
+  for (const m of Array.isArray(list) ? list : []) { const c = cleanMeta(m); S.files.set(p.id + ':' + c.fid, { ...c, owner: p.id, ownerName: p.name, avail: true }); n++; }
+  if (n) { bump('files'); addChat('', p.name + ' partage ' + n + ' fichier(s)', false, true); }
+  schedule(renderFiles);
+}
+function addRemoteFile(p, meta) {
+  const c = cleanMeta(meta); S.files.set(p.id + ':' + c.fid, { ...c, owner: p.id, ownerName: p.name, avail: true });
+  bump('files'); addChat('', p.name + ' a partagé « ' + c.name + ' » (' + fmtSize(c.size) + ')', false, true); schedule(renderFiles);
+}
+function removeRemoteFile(p, fid) { S.files.delete(p.id + ':' + String(fid)); schedule(renderFiles); }
+function setOwnerAvail(pid, v) { for (const f of S.files.values()) if (f.owner === pid) f.avail = v; schedule(renderFiles); }
+function dropOwner(pid) { for (const [k, f] of S.files) if (f.owner === pid) S.files.delete(k); schedule(renderFiles); }
+
+const waitLow = ch => new Promise(res => {
+  let done = false; const f = () => { if (!done) { done = true; ch.removeEventListener('bufferedamountlow', f); res(); } };
+  ch.addEventListener('bufferedamountlow', f); setTimeout(f, 1000);
+});
+function setupFdc(p, ch) {
+  ch.binaryType = 'arraybuffer'; ch.bufferedAmountLowThreshold = 1024 * 1024;
+  ch.onopen = () => { log('Canal fichiers ouvert avec ' + p.name, 'ok'); };
+  ch.onmessage = e => {
+    if (typeof e.data === 'string') {
+      let m; try { m = JSON.parse(e.data); } catch { return; }
+      const tr = S.transfers.get(tkey(p, m.rid)); if (!tr || tr.dir !== 'down' || tr.finished) return;
+      if (m.t === 'fstart') { tr.state = 'transfert'; if (m.size >= 0) tr.size = m.size; }
+      else if (m.t === 'fend') finishDownload(tr);
+      return;
+    }
+    const dv = new DataView(e.data); if (dv.byteLength < 4) return;
+    const rid = dv.getUint32(0), tr = S.transfers.get(tkey(p, rid));
+    if (!tr || tr.dir !== 'down' || tr.finished) return;
+    const chunk = new Uint8Array(e.data, 4);
+    tr.got += chunk.length; tr.state = 'transfert';
+    if (tr.writer) tr.chain = tr.chain.then(() => tr.writer.write(chunk)).catch(err => failTransfer(tr, 'Écriture impossible : ' + (err && err.message)));
+    else tr.chunks.push(chunk);
+    if (tr.got - tr.ackSent >= 4 * 1024 * 1024) {
+      tr.ackSent = tr.got; const g = tr.got;
+      tr.chain.then(() => dcSend(p, { t: 'fack', rid, bytes: g }));
+    }
+    schedule(renderFiles);
+  };
+}
+async function serveFile(p, rid, fid) {
+  const f = S.files.get('me:' + fid), fdc = p.fdc;
+  if (!f || !f.file) { dcSend(p, { t: 'ferr', rid, msg: 'Fichier indisponible' }); return; }
+  if (!fdc || fdc.readyState !== 'open') { dcSend(p, { t: 'ferr', rid, msg: 'Canal fichiers fermé' }); return; }
+  const tr = { key: tkey(p, rid), rid, dir: 'up', peer: p, fid, name: f.name, size: f.size, sent: 0, acked: 0, cancelled: false, finished: false, state: 'transfert', t0: performance.now(), wake: null };
+  S.transfers.set(tr.key, tr); schedule(renderFiles);
+  fdc.send(JSON.stringify({ t: 'fstart', rid, fid, name: f.name, size: f.size, type: f.type }));
+  const CH = 64 * 1024, SLICE = 1024 * 1024, WIN = 16 * 1024 * 1024;
+  try {
+    for (let off = 0; off < f.size && !tr.cancelled;) {
+      while (!tr.cancelled && tr.sent - tr.acked > WIN) {          // fenêtre d'acquittement : protège la mémoire du destinataire
+        if (fdc.readyState !== 'open') throw new Error('Connexion perdue');
+        await new Promise(r => { tr.wake = r; setTimeout(r, 1000); });
+      }
+      if (tr.cancelled) break;
+      const buf = new Uint8Array(await f.file.slice(off, Math.min(off + SLICE, f.size)).arrayBuffer());
+      for (let i = 0; i < buf.length && !tr.cancelled; i += CH) {
+        if (fdc.readyState !== 'open') throw new Error('Connexion perdue');
+        if (fdc.bufferedAmount > 4 * 1024 * 1024) await waitLow(fdc);
+        const part = buf.subarray(i, Math.min(i + CH, buf.length));
+        const frame = new Uint8Array(4 + part.length);
+        new DataView(frame.buffer).setUint32(0, rid >>> 0); frame.set(part, 4);
+        fdc.send(frame); tr.sent += part.length;
+      }
+      off += buf.length; schedule(renderFiles);
+    }
+    if (!tr.cancelled) { fdc.send(JSON.stringify({ t: 'fend', rid })); endTransfer(tr, 'terminé'); }
+  } catch (e) { endTransfer(tr, 'échec', e.message); dcSend(p, { t: 'ferr', rid, msg: e.message }); }
+}
+async function downloadFile(key) {
+  const f = S.files.get(key); if (!f || f.owner === 'me') return;
+  const p = S.peers.get(f.owner);
+  if (!p || !f.avail || !p.dc || p.dc.readyState !== 'open' || !p.fdc || p.fdc.readyState !== 'open') { toast('Le propriétaire du fichier n’est pas joignable.'); return; }
+  let writer = null;
+  if (window.showSaveFilePicker) {            // Chrome / Edge : écriture directe sur le disque, adaptée aux gros fichiers
+    try { const h = await window.showSaveFilePicker({ suggestedName: safeName(f.name) }); writer = await h.createWritable(); }
+    catch (e) { if (e && e.name === 'AbortError') return; writer = null; }
+  }
+  if (!writer && f.size > 1.5 * 1024 ** 3) { toast('Ce navigateur ne peut pas enregistrer directement un fichier de cette taille. Utilisez Chrome ou Edge.', 7000); return; }
+  const rid = (S.rid++) >>> 0;
+  const tr = { key: tkey(p, rid), rid, dir: 'down', peer: p, fid: f.fid, name: f.name, size: f.size, type: f.type, got: 0, ackSent: 0, writer, chunks: [], chain: Promise.resolve(), finished: false, state: 'attente', t0: performance.now() };
+  S.transfers.set(tr.key, tr);
+  dcSend(p, { t: 'fget', rid, fid: f.fid });
+  schedule(renderFiles);
+}
+function endTransfer(tr, state, msg) { tr.finished = true; tr.state = state; tr.msg = msg || ''; tr.t1 = performance.now(); schedule(renderFiles); }
+function failTransfer(tr, msg, state) {
+  if (tr.finished) return;
+  if (tr.writer) { try { tr.writer.abort(); } catch { /* ignoré */ } }
+  tr.chunks = []; endTransfer(tr, state || 'échec', msg);
+}
+async function finishDownload(tr) {
+  if (tr.finished) return;
+  tr.finished = true;                          // évite un double traitement ; l'état final est posé ci-dessous
+  try {
+    await tr.chain;
+    if (tr.state === 'échec') return;
+    if (tr.got !== tr.size) throw new Error('taille reçue incorrecte (' + tr.got + ' sur ' + tr.size + ' octets)');
+    if (tr.writer) await tr.writer.close();
+    else {
+      const blob = new Blob(tr.chunks, { type: tr.type || 'application/octet-stream' }); tr.chunks = [];
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = safeName(tr.name);
+      document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 60000);
+    }
+    endTransfer(tr, 'terminé'); toast('« ' + tr.name + ' » reçu');
+  } catch (e) { tr.finished = false; failTransfer(tr, e.message); }
+}
+function cancelTransfer(key) {
+  const tr = S.transfers.get(key); if (!tr || tr.finished) return;
+  dcSend(tr.peer, { t: 'fcancel', rid: tr.rid });
+  if (tr.dir === 'up') { tr.cancelled = true; endTransfer(tr, 'annulé'); if (tr.wake) tr.wake(); }
+  else failTransfer(tr, '', 'annulé');
+}
+function renderFiles() {
+  if (!$('#fList')) return;
+  const all = [...S.files.entries()];
+  $('#fCount').textContent = all.length ? '(' + all.length + ')' : '';
+  $('#fList').innerHTML = all.length ? all.map(([k, f]) => {
+    const mine = f.owner === 'me';
+    const busy = !mine && [...S.transfers.values()].some(t => t.dir === 'down' && !t.finished && t.peer.id === f.owner && t.fid === f.fid);
+    return `<div class="frow${f.avail ? '' : ' off'}"><span class="ico">${ICONS.file}</span><div class="fi"><div class="fn" title="${esc(f.name)}">${esc(f.name)}</div>
+      <div class="fm">${fmtSize(f.size)} · ${mine ? 'partagé par vous' : esc(f.ownerName) + (f.avail ? '' : ' (hors ligne)')}</div></div>
+      ${mine ? `<button class="btn icon sm" data-act="rm" data-k="${esc(f.fid)}" title="Ne plus partager">${ICONS.trash}</button>`
+        : `<button class="btn primary sm" data-act="dl" data-k="${esc(k)}" ${(!f.avail || busy) ? 'disabled' : ''}>${ICONS.download}Télécharger</button>`}</div>`;
+  }).join('') : '<div class="hint">Aucun fichier partagé pour le moment.</div>';
+  const now = performance.now(), ts = [...S.transfers.values()].sort((a, b) => b.t0 - a.t0);
+  $('#tList').innerHTML = ts.length ? ts.map(t => {
+    const done = t.dir === 'down' ? t.got : t.sent, pct = t.size ? Math.min(100, Math.round(done * 100 / t.size)) : (t.finished ? 100 : 0);
+    const dt = ((t.t1 || now) - t.t0) / 1000, sp = dt > 0.5 ? done / dt : 0;
+    const who = esc(t.peer.name);
+    const meta = t.finished ? esc(t.state) + (t.msg ? ' — ' + esc(t.msg) : '') + ' · ' + fmtSize(t.size)
+      : (t.state === 'attente' ? 'en attente de ' + who + '…' : pct + ' % · ' + fmtSize(sp) + '/s');
+    return `<div class="frow"><span class="ico">${t.dir === 'down' ? ICONS.download : ICONS.upload}</span><div class="fi">
+      <div class="fn" title="${esc(t.name)}">${esc(t.name)}</div><div class="fm">${t.dir === 'down' ? 'de ' : 'vers '}${who} · ${meta}</div>
+      ${t.finished ? '' : `<div class="bar2"><i style="width:${pct}%"></i></div>`}</div>
+      ${t.finished ? '' : `<button class="btn icon sm" data-act="cx" data-k="${esc(t.key)}" title="Annuler">${ICONS.x}</button>`}</div>`;
+  }).join('') : '<div class="hint">Aucun transfert.</div>';
+  if ([...S.transfers.values()].some(t => !t.finished)) schedule(renderFiles);
+}
+
+/* ============ Connexion : état, pairs, relais ============ */
+function updateStatus() {
+  const dot = $('#statusDot'), txt = $('#statusTxt');
+  if (!S.inRoom) { dot.className = 'dot'; txt.textContent = 'Hors réunion'; return; }
+  const live = [...S.peers.values()].filter(p => p.pc.connectionState === 'connected');
+  const relayed = live.some(p => p.routeCls === 'warn');
+  if (!live.length) { dot.className = 'dot warn'; txt.textContent = 'Réunion · en attente de participants…'; return; }
+  dot.className = 'dot ok'; txt.textContent = 'Réunion · ' + (live.length + 1) + ' participants' + (relayed ? ' · via relais' : ' · liaison directe');
+}
+function renderConn() {
+  updateStatus();
+  if (!S.inRoom) return;
+  const rs = [...S.relays.values()], okN = rs.filter(r => r.cls === 'ok').length;
+  $('#connInfo').innerHTML = `<div class="kv">
+    <span>Identité</span><span>${esc(S.name)} <span class="mut">(${esc(S.myId)})</span></span>
+    <span>Salle</span><span class="mut">${esc((S.roomId || '').slice(0, 16))}…</span>
+    <span>Signalisation</span><span class="${okN ? 'ok' : 'ko'}">${okN} / ${rs.length} relais joignables</span>
+    <span>Relais TURN</span><span>${S.turn.length ? (S.force ? '<b class="warn">forcé</b> (tout passe par le relais)' : 'en secours') : '<span class="mut">non configuré</span>'}</span>
+    <span>Chiffrement</span><span>signalisation AES-256-GCM · médias DTLS-SRTP</span></div>
+    <div style="margin-top:8px;display:grid;gap:3px">${rs.map(r => `<div class="row" style="gap:6px"><i class="dot ${r.cls}"></i><span style="flex:1;overflow:hidden;text-overflow:ellipsis">${esc(r.url.replace('wss://', ''))}</span><span class="mut">${r.rtt != null ? r.rtt + ' ms' : esc(r.state)}</span></div>`).join('')}</div>`;
+  const ps = [...S.peers.values()];
+  $('#connPeers').innerHTML = ps.length ? ps.map(p => {
+    const st = p.pc.connectionState, cls = st === 'connected' ? 'ok' : st === 'failed' ? 'ko' : 'warn';
+    const rt = p.rtt ?? p.icertt;
+    return `<div class="peer"><div class="pt"><i class="dot ${cls}"></i>${esc(p.name)}<span class="mut" style="font-weight:400">${esc(st)}</span></div>
+      <div class="row" style="gap:6px">${p.route ? `<span class="badge2 ${p.routeCls}">${esc(p.route)}</span>` : ''}
+      <span class="mut">${rt != null ? rt + ' ms' : ''}${p.kin != null ? ' · ↓' + p.kin + ' ↑' + p.kout + ' kbit/s' : ''}</span></div>
+      <div class="hint">Vidéo : ${p.vin ? '<span class="ok">reçue</span>' : '<span class="warn">aucune image reçue</span>'} · ${S.local && S.local.getVideoTracks().length ? (p.vout ? '<span class="ok">ma caméra est envoyée</span>' : '<span class="warn">ma caméra n\'est pas encore envoyée</span>') : '<span class="warn">je n\'ai pas de caméra</span>'}</div>
+      ${p.sas ? `<div class="hint">Code de vérification : <b style="color:var(--fg);font-size:14px">${esc(p.sas)}</b> — à comparer à l'oral avec ${esc(p.name)}</div>` : ''}
+      <div class="hint">Candidats : ${esc(Object.entries(p.cands).map(([k, v]) => k + ':' + v).join(' ') || '–')}</div></div>`;
+  }).join('') : '<div class="hint">En attente d\'autres participants…</div>';
+  for (const p of ps) { const lab = $('#tile-' + p.id + ' .nm'); if (lab) lab.textContent = p.name + ' · ' + p.pc.connectionState; }
+}
+async function statsLoop() {
+  for (const p of S.peers.values()) {
+    if (p.dc && p.dc.readyState === 'open') dcSend(p, { t: 'ping', ts: performance.now() });
+    if (p.pc.connectionState !== 'connected') continue;
+    try {
+      const st = await p.pc.getStats(); let sel;
+      st.forEach(r => { if (r.type === 'transport' && r.selectedCandidatePairId) sel = st.get(r.selectedCandidatePairId); });
+      if (sel) {
+        const l = st.get(sel.localCandidateId), m = st.get(sel.remoteCandidateId);
+        const relay = l.candidateType === 'relay' || m.candidateType === 'relay';
+        p.route = (relay ? 'Relais TURN' : 'Direct') + ' · ' + l.protocol.toUpperCase();
+        p.routeCls = relay ? 'warn' : 'ok';
+        p.icertt = sel.currentRoundTripTime != null ? Math.round(sel.currentRoundTripTime * 1000) : null;
+      }
+      let rx = 0, tx = 0, vin = 0, vout = 0;
+      st.forEach(r => {
+        if (r.type === 'inbound-rtp') { rx += r.bytesReceived || 0; if (r.kind === 'video') vin += r.framesDecoded || 0; }
+        if (r.type === 'outbound-rtp') { tx += r.bytesSent || 0; if (r.kind === 'video') vout += r.framesEncoded || 0; }
+      });
+      p.vin = vin; p.vout = vout;
+      const now = performance.now();
+      if (p.last) { const dt = (now - p.last.t) / 1000; p.kin = Math.round((rx - p.last.rx) * 8 / 1000 / dt); p.kout = Math.round((tx - p.last.tx) * 8 / 1000 / dt); }
+      p.last = { t: now, rx, tx };
+    } catch { /* ignoré */ }
+  }
+  renderConn(); renderPeople();
+}
+
+/* ============ Entrée / sortie de réunion ============ */
+function parseSecret(s) {                       // « secret » ou « secret.empreinte-de-l-hôte » (avec ou sans lien devant)
+  s = (s || '').trim(); if (s.includes('#')) s = s.split('#').pop();
+  const [a, f] = s.split('.');
+  try { const b = ub64u(a); if (b.length === 16) return { secret: b, hostfp: /^[A-Za-z0-9_-]{22}$/.test(f || '') ? f : null }; } catch { /* invalide */ }
+  return null;
+}
+async function turnServers() {
+  const urls = lines('#setTurn'), a = $('#setTurnA').value.trim(), b = $('#setTurnB').value;
+  if (!urls.length || !a) return [];
+  if ($('#setTurnMode').value === 'static') return [{ urls, username: a, credential: b }];
+  // identifiants temporaires (format coturn "use-auth-secret") : utilisateur = expiration:étiquette
+  const user = (Math.floor(Date.now() / 1000) + 86400) + ':' + (S.name || 'test').replace(/[^\w.-]/g, '_');
+  const k = await crypto.subtle.importKey('raw', enc.encode(a), { name: 'HMAC', hash: 'SHA-1' }, false, ['sign']);
+  const sig = new Uint8Array(await crypto.subtle.sign('HMAC', k, enc.encode(user)));
+  return [{ urls, username: user, credential: b64(sig) }];
+}
+async function enter(secret, hostfp) {
+  if (S.inRoom) return;
+  saveSettings();
+  if (!(await schnorrReady)) { toast('Bibliothèque de signature indisponible (CDN bloqué ?). Voir Paramètres et tests.', 7000); return; }
+  const relays = lines('#setRelays');
+  if (!relays.length) { toast('Aucun relais de signalisation configuré (Paramètres et tests).', 6000); return; }
+  S.name = $('#name').value.trim() || 'Anonyme-' + Math.floor(Math.random() * 900 + 100);
+  S.stun = lines('#setStun'); S.secret = secret; S.force = $('#setForce').checked;
+  S.turn = await turnServers();
+  const d = await derive(secret); S.roomId = d.roomId; S.key = d.key;
+  S.myId = hex(crypto.getRandomValues(new Uint8Array(4)));
+  S.priv = schnorr.utils.randomPrivateKey(); S.pub = hex(schnorr.getPublicKey(S.priv));   // clés Nostr jetables
+  S.inRoom = true;
+  S.hostfp = hostfp || null;                    // empreinte de la clé de l'hôte, portée par le lien d'invitation
+  if (S.hostfp) {
+    const k = await loadHostKey(S.hostfp);      // présente seulement sur l'ordinateur qui a créé la réunion
+    if (k) { S.isHost = true; S.hostKey = k; const ts = Date.now(); S.hostClaim = { pub: k.pub, ts, sig: await signHost(['lus-host', S.roomId, S.myId, ts].join('|')) }; }
+  }
+
+  $('#home').hidden = true; $('#meet').hidden = false; $('#bSide').hidden = false; $('#settings').hidden = true; $('#bSettings').classList.remove('on');
+  selectTab('chat');
+  const tok = b64u(secret) + (S.hostfp ? '.' + S.hostfp : '');
+  const link = location.href.split('#')[0] + '#' + tok;
+  $('#invCode').textContent = link;
+  $('#invHint').textContent = location.protocol === 'file:'
+    ? 'Cette page est ouverte depuis un fichier : le lien ne fonctionne que sur ce poste. Envoyez plutôt le secret (après le #) ou hébergez la page.'
+    : 'Envoyez ce lien aux participants. Il contient le secret de la réunion : ne le publiez pas.';
+  history.replaceState(null, '', '#' + tok);
+  log('Réunion prête. Mon identifiant : ' + S.myId);
+  if (S.turn.length) log('Relais TURN configuré : ' + lines('#setTurn').join(', ') + (S.force ? ' — mode FORCÉ' : ' — en secours'));
+  else if (S.force) log('Mode « forcer le relais » activé sans relais TURN : aucune connexion possible', 'ko');
+  addChat('', S.isHost ? 'Vous êtes l’hôte : gérez les participants et leurs droits depuis l’onglet Personnes. Invitez depuis l’onglet Connexion.' : 'Vous avez rejoint la réunion.', false, true);
+  if (!S.isHost) setTimeout(() => { if (S.inRoom && ![...S.peers.values()].length) toast('Personne n’est encore connecté. Si la réunion est verrouillée, attendez que l’hôte vous admette.', 7000); }, 15000);
+
+  updateCtrl(); renderConn(); renderFiles();
+  await startLocalMedia($('#useCam').checked, $('#useMic').checked);
+  for (const u of relays) connectRelay(u);
+  const hello = () => { if (![...S.peers.values()].some(p => p.pc.connectionState === 'connected')) send({ t: 'hello' }); };
+  // « hello » espacé de plus en plus : les relais publics bannissent les clients trop bavards
+  let hn = 0; const delays = [3000, 4000, 6000, 8000, 12000, 20000];
+  const helloLoop = () => { if (S.closed) return; hello(); setTimeout(helloLoop, delays[Math.min(hn++, delays.length - 1)]); };
+  setTimeout(helloLoop, 1500);
+  S.timers.push(setInterval(statsLoop, 2000));
+}
+function leave() {
+  S.closed = true; S.timers.forEach(clearInterval);
+  for (const r of S.relays.values()) try { r.ws && r.ws.close(); } catch { /* ignoré */ }
+  for (const p of S.peers.values()) try { p.pc.close(); } catch { /* ignoré */ }
+  if (S.local) S.local.getTracks().forEach(t => t.stop());
+  if (S.screen) S.screen.getTracks().forEach(t => t.stop());
+  history.replaceState(null, '', location.pathname); location.reload();
+}
+
+/* ============ Tests préalables (relais, STUN, TURN) ============ */
+function testRelay(url) {
+  return new Promise(res => {
+    const t0 = performance.now(); let done = false, ws; const out = { url, conn: '…', pub: 'timeout' };
+    const fin = () => { if (!done) { done = true; try { ws && ws.close(); } catch { /* ignoré */ } res(out); } };
+    try { ws = new WebSocket(url); } catch { out.conn = 'URL invalide'; return res(out); }
+    const priv = schnorr.utils.randomPrivateKey(), pub = hex(schnorr.getPublicKey(priv));
+    ws.onopen = async () => {
+      out.conn = Math.round(performance.now() - t0) + ' ms';
+      const ev = await makeEvent('test', 'test' + Math.random(), priv, pub); const t1 = performance.now();
+      ws.onmessage = e => { try { const m = JSON.parse(e.data); if (m[0] === 'OK' && m[1] === ev.id) { out.pub = m[2] ? 'accepté (' + Math.round(performance.now() - t1) + ' ms)' : 'refusé : ' + m[3]; fin(); } } catch { /* ignoré */ } };
+      ws.send(JSON.stringify(['EVENT', ev]));
+    };
+    ws.onerror = () => { out.conn = 'échec'; fin(); };
+    setTimeout(fin, 6000);
+  });
+}
+async function testStun(urls) {
+  const pc = new RTCPeerConnection({ iceServers: [{ urls }] }); pc.createDataChannel('x'); const types = {};
+  pc.onicecandidate = e => { if (e.candidate) types[e.candidate.type] = (types[e.candidate.type] || 0) + 1; };
+  await pc.setLocalDescription(await pc.createOffer()); await gathered(pc, 5000); pc.close(); return types;
+}
+async function testTurn(servers) {
+  const pc = new RTCPeerConnection({ iceServers: servers, iceTransportPolicy: 'relay' }); pc.createDataChannel('x');
+  const t0 = performance.now(), out = { relay: 0, ms: null, errors: [] };
+  pc.onicecandidate = e => { if (e.candidate && e.candidate.type === 'relay') { out.relay++; if (out.ms == null) out.ms = Math.round(performance.now() - t0); } };
+  pc.onicecandidateerror = e => out.errors.push(e.errorCode + ' ' + (e.errorText || '') + ' ' + (e.url || ''));
+  await pc.setLocalDescription(await pc.createOffer()); await gathered(pc, 7000); pc.close(); return out;
+}
+async function runTests() {
+  const box = $('#testout'); box.innerHTML = '<span class="mut">Test en cours…</span>'; $('#bTest').disabled = true;
+  try {
+    let h = '';
+    if (!(await schnorrReady)) h += '<div class="ko">Bibliothèque de signature non chargée (CDN jsdelivr / esm.sh bloqué ?) : la signalisation est impossible.</div>';
+    else {
+      const rs = await Promise.all(lines('#setRelays').map(testRelay));
+      h += '<table><tr><th>Relais de signalisation</th><th>Connexion</th><th>Publication</th></tr>';
+      for (const r of rs) h += `<tr><td>${esc(r.url.replace('wss://', ''))}</td><td class="${/ms/.test(r.conn) ? 'ok' : 'ko'}">${esc(r.conn)}</td><td class="${/^accepté/.test(r.pub) ? 'ok' : 'ko'}">${esc(r.pub)}</td></tr>`;
+      h += '</table>';
+    }
+    try {
+      const t = await testStun(lines('#setStun'));
+      h += `<div style="margin-top:8px">Candidats ICE : <b>${esc(Object.entries(t).map(([k, v]) => k + ':' + v).join('  ') || 'aucun')}</b> — `
+        + (t.srflx ? '<span class="ok">STUN/UDP OK (adresse publique découverte)</span>' : '<span class="ko">aucun candidat srflx : UDP ou STUN bloqué depuis ce réseau</span>') + '</div>';
+    } catch (e) { h += '<div class="ko">Test STUN impossible : ' + esc(e.message) + '</div>'; }
+    try {
+      const ts = await turnServers();
+      if (!ts.length) h += '<div class="mut" style="margin-top:8px">Relais TURN : non configuré (renseignez l’adresse et le secret pour le tester).</div>';
+      else {
+        const t = await testTurn(ts);
+        h += '<div style="margin-top:8px">Relais TURN : ' + (t.relay ? `<span class="ok">OK — adresse de relais obtenue en ${t.ms} ms (${t.relay} candidat(s) relay)</span>` : '<span class="ko">ÉCHEC — aucune adresse de relais obtenue</span>')
+          + (t.errors.length ? (t.relay ? '<div class="mut">Avertissements ignorés (normal avec plusieurs cartes réseau : certaines ne joignent pas le relais, une autre y arrive) : ' + t.errors.length + '</div>' : '<div class="ko">' + t.errors.map(esc).join('<br>') + '</div>') : '')
+          + (!t.relay && !t.errors.length ? '<div class="mut">Aucune réponse du relais. Regardez sa fenêtre : voyez-vous des lignes « requête Allocate » ? Sinon le navigateur n’atteint pas le relais (proxy ou politique).</div>' : '') + '</div>';
+      }
+    } catch (e) { h += '<div class="ko">Test TURN impossible : ' + esc(e.message) + '</div>'; }
+    box.innerHTML = h;
+  } finally { $('#bTest').disabled = false; }
+}
+
+/* ============ Branchement de l'interface ============ */
+function openSettings(on) {
+  const s = $('#settings'); s.hidden = on === undefined ? !s.hidden : !on;
+  $('#bSettings').classList.toggle('on', !s.hidden);
+}
+$('#bSettings').onclick = () => openSettings();
+$('#bOpenSettings').onclick = () => openSettings(true);
+$('#bSetClose').onclick = () => openSettings(false);
+$('#bSide').onclick = () => { const s = $('#side'); s.hidden = !s.hidden; $('#bSide').classList.toggle('on', !s.hidden); if (!s.hidden) selectTab(S.tab); };
+$('#themeSel').onchange = e => { applyTheme(e.target.value); ls.set('theme', e.target.value); };
+$('#bTest').onclick = runTests;
+$('#bDefaults').onclick = () => { $('#setRelays').value = DEF.relays; $('#setStun').value = DEF.stun; $('#setTurn').value = DEF.turn; $('#setTurnMode').value = 'secret'; $('#setForce').checked = false; saveSettings(); toast('Valeurs par défaut rétablies'); };
+['#setRelays', '#setStun', '#setTurn', '#setTurnMode', '#setTurnA', '#setTurnB', '#setForce', '#setRemember', '#name', '#useCam', '#useMic'].forEach(s => { $(s).addEventListener('change', saveSettings); $(s).addEventListener('input', saveSettings); });
+$('#bCreate').onclick = async () => {
+  try { const k = await makeHostKey(), fp = await hostFpOf(k.pub); ls.set('hk.' + fp, JSON.stringify({ pub: k.pub, priv: k.privJwk })); enter(crypto.getRandomValues(new Uint8Array(16)), fp); }
+  catch (e) { toast('Création impossible : ' + e.message); }
+};
+$('#bJoin').onclick = () => { const r = parseSecret($('#joinIn').value); r ? enter(r.secret, r.hostfp) : toast('Lien ou secret invalide.'); };
+$('#joinIn').onkeydown = e => { if (e.key === 'Enter') $('#bJoin').click(); };
+$('#cMic').onclick = () => toggleTrack('audio');
+$('#cCam').onclick = () => toggleTrack('video');
+$('#cScreen').onclick = () => (S.screen ? stopScreen() : startScreen());
+$('#ctlOk').onclick = () => { const p = S.peers.get(S.ctlReq); S.ctlReq = null; if (!p || !S.screen) { $('#ctlbar').hidden = true; return; } S.ctl = p.id; dcSend(p, { t: 'ctl', a: 'grant', native: hasNative() }); showCtlBar('active', p); };
+$('#ctlNo').onclick = () => { const p = S.peers.get(S.ctlReq); S.ctlReq = null; $('#ctlbar').hidden = true; if (p) dcSend(p, { t: 'ctl', a: 'deny' }); };
+$('#ctlStop').onclick = () => endControl(true);
+$('#cFiles').onclick = () => selectTab('files');
+$('#cLeave').onclick = leave;
+$$('.stab').forEach(b => { b.onclick = () => selectTab(b.dataset.tab); });
+$('#bSend').onclick = sendChat;
+$('#chatIn').onkeydown = e => { if (e.key === 'Enter') sendChat(); };
+$('#bCopyLink').onclick = () => { navigator.clipboard.writeText($('#invCode').textContent); toast('Lien copié'); };
+$('#bCopySecret').onclick = () => { navigator.clipboard.writeText($('#invCode').textContent.split('#').pop()); toast('Secret copié'); };
+$('#bAddFiles').onclick = () => $('#fPick').click();
+$('#fPick').onchange = e => { addLocalFiles(e.target.files); e.target.value = ''; };
+$('#bClearT').onclick = () => { for (const [k, t] of S.transfers) if (t.finished) S.transfers.delete(k); renderFiles(); };
+const filesPane = e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  if (b.dataset.act === 'dl') downloadFile(b.dataset.k);
+  else if (b.dataset.act === 'rm') removeLocalFile(b.dataset.k);
+  else if (b.dataset.act === 'cx') cancelTransfer(b.dataset.k);
+};
+$('#fList').addEventListener('click', filesPane); $('#tList').addEventListener('click', filesPane);
+$('#pane-people').addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || !S.isHost) return; const a = b.dataset.act, id = b.dataset.id;
+  if (a === 'muteall') { hostCmd('muteall'); toast('Micros des participants coupés'); }
+  else if (a === 'lock') toggleLock();
+  else if (a === 'defperm') { S.hs.defaults[b.dataset.k] = !S.hs.defaults[b.dataset.k]; pushState(); }
+  else if (a === 'perm') setPerm(id, b.dataset.k);
+  else if (a === 'mmic' || a === 'mcam' || a === 'mscr') { hostCmd('mute', { kind: a === 'mmic' ? 'mic' : a === 'mcam' ? 'cam' : 'screen' }, id); toast('Demande envoyée'); }
+  else if (a === 'kick') { const p = S.peers.get(id); if (p && confirm('Exclure ' + p.name + ' de la réunion ?\nLa réunion sera aussi verrouillée pour empêcher son retour (vous pourrez la déverrouiller).')) kickPeer(id); }
+  else if (a === 'admit') admit(id);
+  else if (a === 'refuse') { S.pendingJoin.delete(id); S.banned.add(id); renderPeople(); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#settings').hidden) openSettings(false); });
+// glisser-déposer de fichiers n'importe où pendant la réunion
+let dragDepth = 0;
+const hasFiles = e => [...((e.dataTransfer && e.dataTransfer.types) || [])].includes('Files');
+document.addEventListener('dragenter', e => { if (!S.inRoom || !hasFiles(e)) return; e.preventDefault(); dragDepth++; $('#dropov').hidden = false; });
+document.addEventListener('dragover', e => { if (S.inRoom && hasFiles(e)) e.preventDefault(); });
+document.addEventListener('dragleave', e => { if (!S.inRoom) return; dragDepth = Math.max(0, dragDepth - 1); if (!dragDepth) $('#dropov').hidden = true; });
+document.addEventListener('drop', e => { if (!S.inRoom || !hasFiles(e)) return; e.preventDefault(); dragDepth = 0; $('#dropov').hidden = true; addLocalFiles(e.dataTransfer.files); selectTab('files'); });
+
+loadSettings();
+{ const nt = ls.get('notice'); if (nt) { ls.del('notice'); setTimeout(() => toast(nt, 9000), 300); } }
+if (location.hash.length > 5) { $('#joinIn').value = location.hash; $('#bJoin').classList.add('primary'); $('#bCreate').classList.remove('primary'); }
+renderFiles(); updateStatus();
+
+/* point d'entrée pour les tests automatisés (sans effet dans un navigateur) */
+if (globalThis.__LUS_TEST__) globalThis.__LUS_TEST__({ S, ensurePeer, setupDc, setupFdc, addLocalFiles, downloadFile, cancelTransfer, removeLocalFile, onDcMessage, sendCatalog, onCtl, toggleControl, showRemoteScreen, dcSend, makeHostKey, hostFpOf, loadHostKey, signHost, checkHostClaim, pushState, hostCmd, permsOf, kickPeer, admit, toggleLock, setPerm, allowed, leave, renderPeople });
+</script>
+</body>
+</html>

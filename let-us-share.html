@@ -162,7 +162,7 @@ td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
 <body>
 <div id="app">
   <div class="bar" id="topbar">
-    <div class="brand"><i class="ico" data-i="share"></i><span>Let Us Share</span><span class="tag">prototype v3.7</span></div>
+    <div class="brand"><i class="ico" data-i="share"></i><span>Let Us Share</span><span class="tag">prototype v3.9</span></div>
     <span class="pill" id="statusPill"><i class="dot" id="statusDot"></i><span id="statusTxt">Hors réunion</span></span>
     <div class="spacer"></div>
     <button class="btn" id="bSide" title="Afficher ou masquer le panneau Chat / Fichiers / Connexion" hidden><span class="ico" data-i="sidebar"></span><span class="hide-s">Panneau</span></button>
@@ -356,7 +356,7 @@ $$('[data-i]').forEach(e => { e.innerHTML = ICONS[e.dataset.i] || ''; });
 /* ============ Réglages mémorisés et thème ============ */
 const ls = { get(k) { try { return localStorage.getItem('lus.' + k); } catch { return null; } }, set(k, v) { try { localStorage.setItem('lus.' + k, v); } catch { /* ignoré */ } }, del(k) { try { localStorage.removeItem('lus.' + k); } catch { /* ignoré */ } } };
 const DEF = {
-  relays: 'wss://nos.lol\nwss://relay.primal.net\nwss://offchain.pub',
+  relays: 'wss://nos.lol\nwss://relay.primal.net\nwss://relay.damus.io\nwss://offchain.pub',
   stun: 'stun:stun.l.google.com:19302\nstun:stun.cloudflare.com:3478',
   turn: 'turns:turn.solenga.fr:443?transport=tcp\nturn:turn.solenga.fr:3478?transport=udp\nturn:turn.solenga.fr:3478?transport=tcp'
 };
@@ -431,7 +431,7 @@ function connectRelay(url) {
     try { ws = new WebSocket(url); } catch (e) { r.state = 'URL invalide'; r.cls = 'ko'; schedule(renderConn); return; }
     r.ws = ws;
     ws.onopen = () => {
-      r.state = 'connecté'; r.cls = 'ok'; r.rtt = Math.round(performance.now() - t0); r.tries = 0;
+      r.state = 'connecté'; r.cls = 'ok'; r.rtt = Math.round(performance.now() - t0); r.up = Date.now();
       ws.send(JSON.stringify(['REQ', 'p2p', { kinds: [KIND], '#t': [S.roomId], since: Math.floor(Date.now() / 1000) - 30 }]));
       schedule(renderConn);
     };
@@ -440,7 +440,10 @@ function connectRelay(url) {
     ws.onclose = () => {
       if (S.closed) return;
       r.state = 'déconnecté'; r.cls = 'warn'; schedule(renderConn);
-      setTimeout(open, Math.min(30000, 1000 * 2 ** r.tries++));
+      // reconnexion très espacée (5 s → 5 min) ; le compteur ne repart à zéro qu'après une connexion stable (> 30 s)
+      if (r.up && Date.now() - r.up > 30000) r.tries = 0; r.up = 0;
+      const banned = /banned|rate|too many|blocked/i.test(r.msg || '');
+      setTimeout(open, Math.min(banned ? 900000 : 300000, 5000 * 2 ** r.tries++));
     };
   };
   open();
@@ -1282,7 +1285,7 @@ async function enter(secret, hostfp) {
   for (const u of relays) connectRelay(u);
   const hello = () => { if (![...S.peers.values()].some(p => p.pc.connectionState === 'connected')) send({ t: 'hello' }); };
   // « hello » espacé de plus en plus : les relais publics bannissent les clients trop bavards
-  let hn = 0; const delays = [3000, 4000, 6000, 8000, 12000, 20000];
+  let hn = 0; const delays = [4000, 8000, 15000, 30000, 60000];
   const helloLoop = () => { if (S.closed) return; hello(); setTimeout(helloLoop, delays[Math.min(hn++, delays.length - 1)]); };
   setTimeout(helloLoop, 1500);
   S.timers.push(setInterval(statsLoop, 2000));

@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b7a75">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Let Us Share</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
@@ -23,14 +27,16 @@
   --edit:#f0953c; --danger:#ee6b6b; --ok:#4cc88a; --warn:#f0953c; --shadow:0 1px 3px rgba(0,0,0,.5),0 6px 22px rgba(0,0,0,.4); color-scheme:dark}
 [hidden]{display:none!important}
 *{box-sizing:border-box}
-html,body{height:100%}
+html,body{height:100%;-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.4 var(--font);overflow:hidden}
 button,input,select,textarea{font:inherit;color:inherit}
 h1,h2,h3{margin:0}
 #app{display:flex;flex-direction:column;height:100%;min-width:0}
+@supports (height:100dvh){html,body,#app{height:100dvh}}
+button,select,.stab,.chip{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
 /* ---- barre du haut (même structure que Let Us PDF) ---- */
-.bar{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--panel);border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:thin;flex:none}
+.bar{padding-top:max(6px,env(safe-area-inset-top,0px));padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px));display:flex;align-items:center;gap:6px;background:var(--panel);border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:thin;flex:none}
 .bar>*{flex:none}
 .spacer{flex:1 1 auto!important;min-width:8px}
 .sep{width:1px;align-self:stretch;background:var(--line);margin:3px 4px}
@@ -151,10 +157,84 @@ table{width:100%;border-collapse:collapse;font-size:12.5px}
 td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
 
 #toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 14px;border-radius:8px;z-index:60;max-width:min(92vw,520px);box-shadow:var(--shadow);font-size:13px}
-@media (max-width:760px){
-  #side{position:absolute;left:0;right:0;bottom:0;width:auto;height:62%;z-index:20;border-left:0;border-top:1px solid var(--line);box-shadow:var(--shadow)}
+.sideclose{display:none;flex:none;align-self:center;margin-right:2px}
+#cChat{position:relative}
+#cChat .bd{position:absolute;top:-4px;right:-4px;margin:0}
+@media (max-width:760px),(max-height:500px) and (pointer:coarse){
   .hide-s{display:none}
-  #tiles{padding-bottom:64px}
+  .brand .tag,.brand span:not(.tag){display:none}
+  .brand{margin-right:0}
+  .brand i{width:28px;height:28px}
+  .bar{gap:8px}
+  #bSide{display:none}
+  #setTurnA,#setTurnB{flex:1 1 100%!important}
+  #statusPill{min-width:0;max-width:40vw;overflow:hidden;white-space:nowrap}
+  #statusTxt{overflow:hidden;text-overflow:ellipsis}
+  .themesel{padding-left:0}
+  .themesel .ico{display:none}
+  .bar .btn{height:40px;min-width:40px;padding:0 10px;justify-content:center}
+  /* champs en 16 px : iOS ne zoome plus à la saisie */
+  .inp,textarea.inp,.themesel select{font-size:16px;height:44px}
+  textarea.inp{height:auto;font-size:13px}
+  .themesel select{height:40px;width:96px;padding:0 4px}
+  #home{padding:12px 12px calc(16px + env(safe-area-inset-bottom,0px));max-width:none}
+  .card{padding:18px 16px;border-radius:12px;gap:14px}
+  .card h1{font-size:19px;line-height:1.25}
+  .card .btn.big{height:50px;font-size:16px}
+  .card .btn{height:44px}
+  label.chk{min-height:40px;font-size:15px}
+  label.chk input{width:20px;height:20px}
+  .row{gap:10px}
+  #joinIn{flex:1 1 100%!important}
+  #bJoin{flex:1 1 100%;background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:500}
+  /* vidéo : une colonne, deux dès qu'il y a 3 tuiles */
+  #tiles{padding:8px 8px calc(92px + env(safe-area-inset-bottom,0px));gap:8px;grid-template-columns:1fr;align-content:center}
+  #tiles:has(.tile:nth-child(3)){grid-template-columns:1fr 1fr;align-content:start}
+  #tiles:has(.tile:nth-child(3)) .tile:not(.screen){aspect-ratio:3/4}
+  .tile{border-radius:10px}
+  .tile .ph{font-size:34px}
+  .tile .tb .btn{height:36px}
+  /* barre de commandes : pleine largeur, grosses cibles tactiles */
+  #ctrl{left:8px;right:8px;transform:none;max-width:none;bottom:calc(8px + env(safe-area-inset-bottom,0px));justify-content:space-around;gap:2px;padding:6px;border-radius:16px}
+  #ctrl .btn{flex:1;min-width:0;height:48px;padding:0;justify-content:center;border-radius:12px}
+  #ctrl .btn svg{width:22px;height:22px}
+  #ctrl .sep{display:none}
+  #ctrl .btn.danger{flex:1.2}
+  #toast{bottom:calc(86px + env(safe-area-inset-bottom,0px))}
+  #ctlbar{top:6px;left:8px;right:8px;transform:none;max-width:none}
+  /* panneau chat/fichiers/personnes/connexion : plein écran sous l'en-tête, au-dessus de la barre de commandes */
+  #side{position:absolute;inset:0 0 calc(72px + env(safe-area-inset-bottom,0px)) 0;width:auto;height:auto;z-index:20;border:0;box-shadow:none}
+  .sideclose{display:inline-flex}
+  .stabs{padding:6px 6px 0;align-items:flex-end}
+  .stab{height:42px;font-size:14px;padding:0 2px}
+  .stab.on{height:43px}
+  .pane{padding:10px}
+  .msg{max-width:88%;font-size:15px}
+  #chatIn{font-size:16px}
+  #bSend{width:44px;height:44px}
+  .dz{flex-wrap:wrap}
+  .dz .btn{width:100%;height:44px}
+  .frow{flex-wrap:wrap}
+  .person .pt{gap:8px}
+  .chip{height:30px;padding:0 11px;font-size:13px}
+  .btn.sm{height:36px;padding:0 12px;font-size:14px}
+  #log{height:150px}
+  .code{font-size:11.5px}
+  /* paramètres : plein écran */
+  #settings{width:100%;border-left:0;z-index:40}
+  #settings .hd2{padding-top:max(10px,env(safe-area-inset-top,0px))}
+  #settings .sbody{padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+  #settings .btn{height:44px}
+  select.inp{font-size:16px}
+}
+@media (orientation:landscape) and (max-height:500px) and (pointer:coarse),(orientation:landscape) and (max-width:760px){
+  #tiles,#tiles:has(.tile:nth-child(3)){grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  #tiles:has(.tile:nth-child(3)) .tile:not(.screen){aspect-ratio:16/9}
+  #ctrl{left:50%;right:auto;transform:translateX(-50%);width:min(420px,calc(100% - 16px))}
+  #ctrl .btn{height:40px}
+  #side{inset:0 0 62px 0}
+  .tile{max-height:calc(100dvh - 150px)}
+  .card{padding:14px}
 }
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
@@ -162,13 +242,13 @@ td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
 <body>
 <div id="app">
   <div class="bar" id="topbar">
-    <div class="brand"><i class="ico" data-i="share"></i><span>Let Us Share</span><span class="tag">prototype v3.9</span></div>
+    <div class="brand"><i class="ico" data-i="share"></i><span>Let Us Share</span><span class="tag">prototype v4.0</span></div>
     <span class="pill" id="statusPill"><i class="dot" id="statusDot"></i><span id="statusTxt">Hors réunion</span></span>
     <div class="spacer"></div>
     <button class="btn" id="bSide" title="Afficher ou masquer le panneau Chat / Fichiers / Connexion" hidden><span class="ico" data-i="sidebar"></span><span class="hide-s">Panneau</span></button>
     <button class="btn" id="bSettings" title="Paramètres et tests réseau (relais, serveurs)"><span class="ico" data-i="gear"></span><span class="hide-s">Paramètres et tests</span></button>
     <label class="themesel" title="Apparence de l'interface"><span class="ico" data-i="theme"></span>
-      <select class="inp" id="themeSel" aria-label="Apparence"><option value="auto">Automatique</option><option value="light">Clair</option><option value="dark">Sombre</option></select></label>
+      <select class="inp" id="themeSel" aria-label="Apparence"><option value="auto">Auto</option><option value="light">Clair</option><option value="dark">Sombre</option></select></label>
   </div>
 
   <div id="main">
@@ -201,6 +281,7 @@ td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
           <button class="btn" id="cCam"><span class="ico" data-i="video"></span><span class="hide-s">Caméra</span></button>
           <button class="btn" id="cScreen" title="Partager votre écran"><span class="ico" data-i="screen"></span><span class="hide-s">Écran</span></button>
           <button class="btn" id="cFiles"><span class="ico" data-i="paperclip"></span><span class="hide-s">Fichiers</span></button>
+          <button class="btn" id="cChat" title="Chat, personnes, connexion"><span class="ico" data-i="chat"></span><span class="hide-s">Chat</span><i class="bd" id="bdCtl" hidden></i></button>
           <div class="sep"></div>
           <button class="btn danger" id="cLeave"><span class="ico" data-i="leave"></span><span class="hide-s">Quitter</span></button>
         </div>
@@ -210,6 +291,7 @@ td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertic
 
     <aside id="side" hidden aria-label="Chat, fichiers et connexion">
       <div class="stabs" role="tablist">
+        <button class="btn icon sideclose" id="bSideX" title="Fermer le panneau" aria-label="Fermer le panneau"><span class="ico" data-i="x"></span></button>
         <button class="stab on" role="tab" data-tab="chat">Chat<i class="bd" id="bdChat" hidden></i></button>
         <button class="stab" role="tab" data-tab="files">Fichiers<i class="bd" id="bdFiles" hidden></i></button>
         <button class="stab" role="tab" data-tab="people">Personnes<i class="bd" id="bdPeople" hidden></i></button>
@@ -344,6 +426,7 @@ const ICONS = {
   x: ic('<path d="m6 6 12 12M18 6 6 18"/>'),
   send: ic('<path d="m4 12 16-8-6 16-3-7z"/>'),
   paperclip: ic('<path d="M20 11.5 12 19.5a5 5 0 0 1-7-7l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7L10 17.2a1.7 1.7 0 0 1-2.4-2.4L15 7.4"/>'),
+  chat: ic('<path d="M4 5h16v11H9l-5 4z"/>'),
   upload: ic('<path d="M12 16V5"/><path d="m7 10 5-5 5 5"/><path d="M5 20h14"/>'),
   download: ic('<path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/>'),
   trash: ic('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>'),
@@ -986,13 +1069,14 @@ function sendChat() {
 }
 function bump(tab) {
   if (S.tab === tab && !$('#side').hidden) return;
-  S.unread[tab]++; const b = $('#bd' + (tab === 'chat' ? 'Chat' : 'Files')); b.textContent = S.unread[tab]; b.hidden = false;
+  S.unread[tab]++; const b = $('#bd' + (tab === 'chat' ? 'Chat' : 'Files')); b.textContent = S.unread[tab]; b.hidden = false; syncCtlBadge();
 }
+function syncCtlBadge() { const n = S.unread.chat + S.unread.files, b = $('#bdCtl'); b.textContent = n; b.hidden = !n; }
 function selectTab(tab) {
   S.tab = tab; $('#side').hidden = false; $('#bSide').classList.add('on');
   $$('.stab').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
   for (const t of ['chat', 'files', 'people', 'conn']) $('#pane-' + t).hidden = t !== tab;
-  if (S.unread[tab] !== undefined) { S.unread[tab] = 0; $('#bd' + (tab === 'chat' ? 'Chat' : 'Files')).hidden = true; }
+  if (S.unread[tab] !== undefined) { S.unread[tab] = 0; $('#bd' + (tab === 'chat' ? 'Chat' : 'Files')).hidden = true; syncCtlBadge(); }
   if (tab === 'conn') renderConn();
   if (tab === 'files') renderFiles();
   if (tab === 'people') renderPeople();
@@ -1267,6 +1351,7 @@ async function enter(secret, hostfp) {
 
   $('#home').hidden = true; $('#meet').hidden = false; $('#bSide').hidden = false; $('#settings').hidden = true; $('#bSettings').classList.remove('on');
   selectTab('chat');
+  if (window.matchMedia && matchMedia('(max-width:760px),(max-height:500px) and (pointer:coarse)').matches) { $('#side').hidden = true; $('#bSide').classList.remove('on'); }   // téléphone : on voit d'abord les vidéos
   const tok = b64u(secret) + (S.hostfp ? '.' + S.hostfp : '');
   const link = location.href.split('#')[0] + '#' + tok;
   $('#invCode').textContent = link;
@@ -1379,11 +1464,15 @@ $('#bJoin').onclick = () => { const r = parseSecret($('#joinIn').value); r ? ent
 $('#joinIn').onkeydown = e => { if (e.key === 'Enter') $('#bJoin').click(); };
 $('#cMic').onclick = () => toggleTrack('audio');
 $('#cCam').onclick = () => toggleTrack('video');
+if (!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia)) $('#cScreen').hidden = true;   // iPhone / Android : pas de partage d'écran dans le navigateur
 $('#cScreen').onclick = () => (S.screen ? stopScreen() : startScreen());
 $('#ctlOk').onclick = () => { const p = S.peers.get(S.ctlReq); S.ctlReq = null; if (!p || !S.screen) { $('#ctlbar').hidden = true; return; } S.ctl = p.id; dcSend(p, { t: 'ctl', a: 'grant', native: hasNative() }); showCtlBar('active', p); };
 $('#ctlNo').onclick = () => { const p = S.peers.get(S.ctlReq); S.ctlReq = null; $('#ctlbar').hidden = true; if (p) dcSend(p, { t: 'ctl', a: 'deny' }); };
 $('#ctlStop').onclick = () => endControl(true);
-$('#cFiles').onclick = () => selectTab('files');
+const sideOff = () => { $('#side').hidden = true; $('#bSide').classList.remove('on'); };
+$('#cFiles').onclick = () => { if (!$('#side').hidden && S.tab === 'files') sideOff(); else selectTab('files'); };
+$('#cChat').onclick = () => { if (!$('#side').hidden && S.tab === 'chat') sideOff(); else selectTab('chat'); };
+$('#bSideX').onclick = sideOff;
 $('#cLeave').onclick = leave;
 $$('.stab').forEach(b => { b.onclick = () => selectTab(b.dataset.tab); });
 $('#bSend').onclick = sendChat;

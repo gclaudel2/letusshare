@@ -884,6 +884,7 @@ const DEF = {
   relays: 'wss://nos.lol\nwss://relay.primal.net\nwss://relay.damus.io\nwss://offchain.pub',
   stun: 'stun:stun.l.google.com:19302\nstun:stun.cloudflare.com:3478',
   turn: 'turns:turn.solenga.fr:443?transport=tcp\nturn:turn.solenga.fr:3478?transport=udp\nturn:turn.solenga.fr:3478?transport=tcp'
+  ,turnSecret: ''   // déploiement en entreprise : secret du relais préenregistré pour tous les utilisateurs de cette copie de la page
 };
 function applyTheme(v) { if (v === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', v); }
 function loadSettings() {
@@ -894,6 +895,7 @@ function loadSettings() {
   $('#setForce').checked = ls.get('force') === '1';
   $('#setRemember').checked = ls.get('remember') === '1';
   if ($('#setRemember').checked) { $('#setTurnA').value = ls.get('turnA') || ''; $('#setTurnB').value = ls.get('turnB') || ''; }
+  if (!$('#setTurnA').value && DEF.turnSecret) $('#setTurnA').value = DEF.turnSecret;
   $('#name').value = ls.get('name') || '';
   $('#useCam').checked = ls.get('cam') !== '0';
   $('#useMic').checked = ls.get('mic') !== '0';

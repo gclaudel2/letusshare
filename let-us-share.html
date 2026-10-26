@@ -389,7 +389,7 @@ body.laydrag .tile video{pointer-events:none}
 <body>
 <div id="app">
   <div class="bar" id="topbar">
-    <div class="brand"><i class="ico" data-i="share"></i><span>Let Us Share</span><span class="tag">prototype v4.12</span></div>
+    <div class="brand"><i class="ico" data-i="share"></i><span>Let Us Share</span><span class="tag">prototype v4.13</span></div>
     <span class="pill" id="statusPill"><i class="dot" id="statusDot"></i><span id="statusTxt">Hors réunion</span></span>
     <div class="spacer"></div>
     <button class="btn" id="bSide" title="Afficher ou masquer le panneau Chat / Fichiers / Connexion" hidden><span class="ico" data-i="sidebar"></span><span class="hide-s">Panneau</span></button>
@@ -1812,9 +1812,57 @@ function bindCtl(p, tile) {
     return x < 0 || x > 1 || y < 0 || y > 1 ? null : { x, y };
   };
   const snd = o => { if (p.ctl) dcSend(p, { t: 'ctl', a: 'ev', e: o }); };
-  v.addEventListener('mousemove', e => { const q = pos(e); if (!q || !p.ctl) return; const n = performance.now(); if (n - last < 30) return; last = n; snd({ k: 'mm', ...q }); });
-  v.addEventListener('mousedown', e => { tile.focus(); const q = pos(e); if (q && p.ctl) { e.preventDefault(); snd({ k: 'md', b: e.button, ...q }); } });
-  v.addEventListener('mouseup', e => { const q = pos(e); if (q && p.ctl) { e.preventDefault(); snd({ k: 'mu', b: e.button, ...q }); } });
+  // --- Tactile (iPhone, iPad, Android) : Safari ne fabrique pas d'événements souris sur une vidéo, on lit donc les doigts.
+  // 1 doigt : le pointeur suit ; tap = clic gauche ; appui long puis glisser = glisser-déposer.
+  // 2 doigts : glisser = molette ; tap à deux doigts = clic droit.
+  v.style.touchAction = 'none'; v.style.webkitTouchCallout = 'none'; v.style.userSelect = 'none';
+  const tp = new Map(); let g = null, lastTouch = 0, lastWh = 0;
+  const noMouse = () => Date.now() - lastTouch < 800;
+  const clickAt = (q, b) => { if (q) { snd({ k: 'md', b, ...q }); snd({ k: 'mu', b, ...q }); } };
+  v.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' || !p.ctl) return;
+    e.preventDefault(); lastTouch = Date.now(); tile.focus();
+    try { v.setPointerCapture(e.pointerId); } catch (er) {}
+    tp.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (tp.size === 1) {
+      g = { sx: e.clientX, sy: e.clientY, ex: e.clientX, ey: e.clientY, moved: false, drag: false, multi: false, scrolled: false, t2: 0, timer: 0, ax: 0, ay: 0 };
+      const q = pos(e); if (q) snd({ k: 'mm', ...q });
+      g.timer = setTimeout(() => {
+        if (!g || g.moved || g.multi) return;
+        g.drag = true; const q2 = pos({ clientX: g.ex, clientY: g.ey }); if (q2) snd({ k: 'md', b: 0, ...q2 });
+        try { navigator.vibrate && navigator.vibrate(20); } catch (er) {}
+      }, 450);
+    } else if (g && !g.multi) { g.multi = true; g.t2 = Date.now(); clearTimeout(g.timer); if (g.drag) { g.drag = false; const q = pos({ clientX: g.ex, clientY: g.ey }); if (q) snd({ k: 'mu', b: 0, ...q }); } }
+  }, { passive: false });
+  v.addEventListener('pointermove', e => {
+    const t = tp.get(e.pointerId); if (!t || !g || !p.ctl) return;
+    e.preventDefault(); lastTouch = Date.now();
+    const dx = e.clientX - t.x, dy = e.clientY - t.y; t.x = e.clientX; t.y = e.clientY;
+    if (g.multi) {                                    // molette : le contenu suit les doigts
+      g.ax += -dx / tp.size; g.ay += -dy / tp.size;
+      if (Math.abs(g.ax) + Math.abs(g.ay) > 6) g.scrolled = true;
+      const n = performance.now(); if (g.scrolled && n - lastWh > 40) { lastWh = n; snd({ k: 'wh', dx: g.ax * 1.5, dy: g.ay * 1.5 }); g.ax = 0; g.ay = 0; }
+      return;
+    }
+    g.ex = e.clientX; g.ey = e.clientY;
+    if (!g.moved && Math.hypot(e.clientX - g.sx, e.clientY - g.sy) > 8) { g.moved = true; if (!g.drag) clearTimeout(g.timer); }
+    if (g.moved || g.drag) { const n = performance.now(); if (n - last < 30) return; last = n; const q = pos(e); if (q) snd({ k: 'mm', ...q }); }
+  }, { passive: false });
+  const tUp = e => {
+    if (!tp.has(e.pointerId)) return;
+    e.preventDefault(); lastTouch = Date.now(); tp.delete(e.pointerId);
+    if (!g || tp.size > 0) return;                    // on attend que le dernier doigt se lève
+    clearTimeout(g.timer);
+    const cancel = e.type === 'pointercancel', here = pos({ clientX: g.ex, clientY: g.ey }), start = pos({ clientX: g.sx, clientY: g.sy });
+    if (g.multi) { if (!cancel && !g.scrolled && Date.now() - g.t2 < 600) clickAt(start, 2); }
+    else if (g.drag) { if (here) snd({ k: 'mu', b: 0, ...here }); }
+    else if (!g.moved && !cancel) clickAt(here || start, 0);
+    g = null;
+  };
+  v.addEventListener('pointerup', tUp, { passive: false }); v.addEventListener('pointercancel', tUp, { passive: false });
+  v.addEventListener('mousemove', e => { if (noMouse()) return; const q = pos(e); if (!q || !p.ctl) return; const n = performance.now(); if (n - last < 30) return; last = n; snd({ k: 'mm', ...q }); });
+  v.addEventListener('mousedown', e => { if (noMouse()) { e.preventDefault(); return; } tile.focus(); const q = pos(e); if (q && p.ctl) { e.preventDefault(); snd({ k: 'md', b: e.button, ...q }); } });
+  v.addEventListener('mouseup', e => { if (noMouse()) { e.preventDefault(); return; } const q = pos(e); if (q && p.ctl) { e.preventDefault(); snd({ k: 'mu', b: e.button, ...q }); } });
   v.addEventListener('wheel', e => { if (p.ctl) { e.preventDefault(); snd({ k: 'wh', dx: e.deltaX, dy: e.deltaY }); } }, { passive: false });
   v.addEventListener('contextmenu', e => { if (p.ctl) e.preventDefault(); });
   for (const [ev, k] of [['keydown', 'kd'], ['keyup', 'ku']]) tile.addEventListener(ev, e => { if (p.ctl) { e.preventDefault(); snd({ k, key: String(e.key).slice(0, 20), code: String(e.code).slice(0, 20), ctrl: e.ctrlKey, alt: e.altKey, shift: e.shiftKey, meta: e.metaKey }); } });
